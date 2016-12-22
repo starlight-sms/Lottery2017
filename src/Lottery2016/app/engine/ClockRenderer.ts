@@ -33,21 +33,21 @@ export class ClockRenderer extends RendererBase {
             angle: this.second() * (360 / 60),
             length: this.radius() * 0.95,
             width: 3,
-            color: "orange"
+            color: "rgba(255, 165, 0, 0.6)"
         };
 
         let minute = {
             angle: this.minute() * (360 / 60),
             length: this.radius() * 0.75,
             width: 6,
-            color: "blue"
+            color: "rgba(0, 0, 255, 0.6)"
         };
 
         let hour = {
             angle: this.hour() * (360 / 12),
             length: this.radius() * 0.55,
             width: 9,
-            color: "red"
+            color: "rgba(255, 0, 0, 0.6)"
         };
 
         return [second, minute, hour];
