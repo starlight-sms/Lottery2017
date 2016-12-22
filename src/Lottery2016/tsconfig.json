@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "noImplicitAny": false,
+    "noEmitOnError": true,
+    "removeComments": false,
+    "sourceMap": true,
+    "target": "es5",
+    "module": "commonjs",
+    "strictNullChecks": true, 
+    "lib": ["dom", "es5"]
+  },
+  "compileOnSave": true, 
+  "exclude": [
+    "node_modules",
+    "wwwroot"
+  ]
+}
