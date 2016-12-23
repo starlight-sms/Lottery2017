@@ -1,95 +1,109 @@
-﻿import { api } from "./api";
-import * as _ from "lodash";
-
+﻿import { api, Person } from "./api";
+import * as rx from "rx";
 import { b2Vec2 } from "./Box2D/Common/b2Math";
 import { b2World } from "./Box2D/Dynamics/b2World";
 import { b2Body, b2BodyDef, b2BodyType } from "./Box2D/Dynamics/b2Body";
 import { b2Fixture, b2FixtureDef } from "./Box2D/Dynamics/b2Fixture";
 import { b2PolygonShape } from "./Box2D/Collision/Shapes/b2PolygonShape";
+import { b2CircleShape } from "./Box2D/Collision/Shapes/b2CircleShape";
+
+import * as KeyBoard from "../engine/KeyBoard";
 
 export class LotteryController {
-    world: b2World;
+    world = new b2World(new b2Vec2(0, -100));
 
     GetBodies() {
-
+        return rx.Observable.create<b2Body>(output => {
+            let body = this.world.GetBodyList();
+            while (body !== null) {
+                output.onNext(body);
+                body = body.GetNext();
+            }
+        });
     }
 
-    Tick() {
-
+    GetPersonBodies() {
+        return this.GetBodies()
+            .filter(x => x.GetUserData() !== null);
     }
 
-    Reset(count: number) {
-        // Define the gravity vector.
-        const gravity: b2Vec2 = new b2Vec2(0, -10);
+    GetBorderBodies() {
+        return this.GetBodies()
+            .filter(x => x.GetUserData() === null);
+    }
 
-        // Construct a world object, which will hold and simulate the rigid bodies.
-        const world: b2World = new b2World(gravity);
-
-        // Define the ground body.
-        const groundBodyDef: b2BodyDef = new b2BodyDef();
-        groundBodyDef.position.Set(0, -10);
-
-        // Call the body factory which allocates memory for the ground body
-        // from a pool and creates the ground box shape (also from a pool).
-        // The body is also added to the world.
-        const groundBody: b2Body = world.CreateBody(groundBodyDef);
-
-        // Define the ground box shape.
-        const groundBox: b2PolygonShape = new b2PolygonShape();
-
-        // The extents are the half-widths of the box.
-        groundBox.SetAsBox(50, 10);
-
-        // Add the ground fixture to the ground body.
-        groundBody.CreateFixture(groundBox, 0);
-
-        // Define the dynamic body. We set its position and call the body factory.
-        const bodyDef: b2BodyDef = new b2BodyDef();
-        bodyDef.type = b2BodyType.b2_dynamicBody;
-        bodyDef.position.Set(0, 4);
-        const body: b2Body = world.CreateBody(bodyDef);
-
-        // Define another box shape for our dynamic body.
-        const dynamicBox: b2PolygonShape = new b2PolygonShape();
-        dynamicBox.SetAsBox(1, 1);
-
-        // Define the dynamic body fixture.
-        const fixtureDef: b2FixtureDef = new b2FixtureDef();
-        fixtureDef.shape = dynamicBox;
-
-        // Set the box density to be non-zero, so it will be dynamic.
-        fixtureDef.density = 1;
-
-        // Override the default friction.
-        fixtureDef.friction = 0.3;
-
-        // Add the shape to the body.
-        const fixture: b2Fixture = body.CreateFixture(fixtureDef);
-
-        // Prepare for simulation. Typically we use a time step of 1/60 of a
-        // second (60Hz) and 10 iterations. This provides a high quality simulation
-        // in most game scenarios.
-        const timeStep: number = 1 / 60;
+    Update(frameTime: number) {
         const velocityIterations: number = 6;
         const positionIterations: number = 2;
 
-        // This is our little game loop.
-        for (let i: number = 0; i < 60; ++i) {
-            // Instruct the world to perform a single step of simulation.
-            // It is generally best to keep the time step and iterations fixed.
-            world.Step(timeStep, velocityIterations, positionIterations);
+        if (!KeyBoard.isKeyDown("p")) {
+            this.world.Step(frameTime, velocityIterations, positionIterations);
+        }        
 
-            // Now print the position and angle of the body.
-            const position: b2Vec2 = body.GetPosition();
-            const angle: number = body.GetAngle();
-
-            console.log(position.x.toFixed(2), position.y.toFixed(2), angle.toFixed(2));
+        if (KeyBoard.isKeyDown(" ")) {
+            this.GetBodies()
+                .filter(x => x.GetUserData() === null)
+                .subscribe(v => {
+                    v.SetType(b2BodyType.b2_unknown);
+                    
+                    //this.world.DestroyBody(v);
+                });
         }
-        this.world = world;
-        //let names = _.chain(
-        //    api.getUnluckyPersons())
-        //    .sampleSize(count)
-        //    .map(x => x.Name)
-        //    .value();
+    }
+
+    Reset(count: number) {
+        this.world.SetAllowSleeping(false);
+        setTimeout(() => this.world.SetGravity(new b2Vec2(0, 0), true), 2000);
+        let CreateBorder = (x: number, y: number, w: number, h: number) => {
+            const groundBodyDef = new b2BodyDef();
+            groundBodyDef.type = b2BodyType.b2_kinematicBody;
+            groundBodyDef.position.Set(x, y);
+
+            let groundBody = this.world.CreateBody(groundBodyDef);
+            let groundBox = new b2PolygonShape();
+            groundBox.SetAsBox(w, h);
+            groundBody.CreateFixture(groundBox, 0);
+        }
+        CreateBorder(50, 25, 25, 0.2);
+        CreateBorder(25, 50, 0.2, 25);
+        CreateBorder(75, 50, 0.2, 25);
+        CreateBorder(50, 75, 25, 0.2);
+
+        let CreateShapeAtRandom = (dto: Person) => {
+            // Define the dynamic body. We set its position and call the body factory.
+            let bodyDef = new b2BodyDef();
+            bodyDef.type = b2BodyType.b2_dynamicBody;
+            bodyDef.position.Set(Math.random() * 40 + 30, Math.random() * 40 + 30);
+            let body = this.world.CreateBody(bodyDef);
+            body.SetUserData(dto);
+            body.ApplyForce(
+                new b2Vec2(Math.random() * 100, Math.random() * 100),
+                new b2Vec2(1, 1), true);
+
+            // Define another box shape for our dynamic body.
+            if (Math.random() > 0.5) {
+                let dynamicBox = new b2CircleShape(1.5)
+                let fixtureDef = new b2FixtureDef();
+                fixtureDef.shape = dynamicBox;
+                fixtureDef.density = 5;
+                fixtureDef.friction = 0;
+                fixtureDef.restitution = 1;
+                let fixture = body.CreateFixture(fixtureDef);
+            } else {
+                let dynamicBox = new b2PolygonShape();
+                dynamicBox.SetAsBox(2, 1);
+                let fixtureDef = new b2FixtureDef();
+                fixtureDef.shape = dynamicBox;
+                fixtureDef.density = 5;
+                fixtureDef.friction = 0;
+                fixtureDef.restitution = 1;
+                let fixture = body.CreateFixture(fixtureDef);
+            }
+        }
+
+        api.getUnluckyPersons().forEach(v => {
+            console.log(v);
+            CreateShapeAtRandom(v);
+        });
     }
 }

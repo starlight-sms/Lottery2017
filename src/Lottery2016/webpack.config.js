@@ -4,7 +4,6 @@
         filename: "dist.js",
         path: "./wwwroot"
     },
-    devtool: "source-map",
     resolve: {
         extensions: ["", ".ts", ".js"]
     },

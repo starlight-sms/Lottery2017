@@ -22,7 +22,7 @@ class Api {
 
     getUnluckyPersons(): Person[] {
         return allPerson
-            .filter(x => this.luckyPersonIds.indexOf(x.Id) !== -1);
+            .filter(x => this.luckyPersonIds.indexOf(x.Id) === -1);
     }
 }
 

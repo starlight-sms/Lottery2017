@@ -29,6 +29,13 @@ export class CanvasManager {
         this.ctx.textBaseline = baseline;
     }
 
+    get lineWidth() {
+        return this.ctx.lineWidth;
+    }
+    set lineWidth(lineWidth: number) {
+        this.ctx.lineWidth = lineWidth;
+    }
+
     resizeTo(width: number, height: number) {
         let font = this.font;
         let textBaseLine = this.textBaseLine;
@@ -99,6 +106,10 @@ export class CanvasManager {
         this.ctx.beginPath();
     }
 
+    closePath() {
+        this.ctx.closePath();
+    }
+
     drawLine(p1x: number, p1y: number, p2x: number, p2y: number, brush?: IBrushType, lineWidth?: number) {
         if (lineWidth) this.ctx.lineWidth = lineWidth;
         if (brush) this.ctx.strokeStyle = brush;
@@ -135,6 +146,11 @@ export class CanvasManager {
         this.ctx.stroke();
     }
 
+    fill(brush?: IBrushType) {
+        if (brush) this.ctx.fillStyle = brush;
+        this.ctx.fill();
+    }
+
     rotate(angle: number, centerX?: number, centerY?: number) {
         this.ctx.rotate(angle % 360);
         centerX && this.ctx.translate(-centerX, -centerY);
@@ -163,6 +179,14 @@ export class CanvasManager {
             gradient.addColorStop(stop.offset, stop.color);
         }
         return gradient;
+    }
+
+    save() {
+        this.ctx.save();
+    }
+
+    restore() {
+        this.ctx.restore();
     }
 
     constructor(private canvas: HTMLCanvasElement) {
