@@ -1,8 +1,8 @@
-﻿import { PromiseEvent } from "./PromiseEvent";
+﻿import { PromiseEventVoid } from "./PromiseEvent";
 
 export class SimpleGameLoop {
-    public onRender = new PromiseEvent<number>();
-    public onUpdate = new PromiseEvent<number>();
+    public onRender = new PromiseEventVoid();
+    public onUpdate = new PromiseEventVoid();
     private keepsRendering = true;
 
     get totalRenderTime() {
@@ -19,13 +19,13 @@ export class SimpleGameLoop {
     }
 
     update(): boolean {
-        this.onUpdate.fire(this.totalRenderTime);
+        this.onUpdate.fire();
         this.decideNextRender();
         return false;
     }
 
     render() {
-        this.onRender.fire(this.totalRenderTime);
+        this.onRender.fire();
     }
 
     decideNextRender() {

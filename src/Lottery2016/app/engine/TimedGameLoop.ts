@@ -4,7 +4,8 @@ import { PromiseEvent } from "./PromiseEvent";
 export class TimedGameLoop extends SimpleGameLoop {
     private _totalRenderTime = 0;
     private _lastFrameTime = new Date();
-    public onRunningSlow = new PromiseEvent<number>();
+    onRunningSlow = new PromiseEvent<number>();
+    frameTime = 0;
 
     get totalRenderTime() {
         return this._totalRenderTime;
@@ -18,6 +19,7 @@ export class TimedGameLoop extends SimpleGameLoop {
         super.update();
         let thisFrameTime = new Date();
         let frameTime = (thisFrameTime.getTime() - this._lastFrameTime.getTime()) / 1000;
+        this.frameTime = frameTime;
         this._lastFrameTime = thisFrameTime;
         this._totalRenderTime += frameTime;
 

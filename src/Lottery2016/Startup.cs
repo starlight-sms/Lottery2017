@@ -40,7 +40,6 @@ namespace Lottery2016
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseBrowserLink();
             }
             else
             {

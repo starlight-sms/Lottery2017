@@ -16,15 +16,15 @@ export abstract class RendererBase {
         this.onSetOrder.fire(this.order);
     }
 
-    update(time: number) {
+    update(time: number, frameTime: number) {
         for (let renderer of this.renderers) {
-            renderer.update(time);
+            renderer.update(time, frameTime);
         }
     }
 
-    render(time: number) {
+    render(time: number, frameTime: number) {
         for (let renderer of this.renderers) {
-            renderer.render(time);
+            renderer.render(time, frameTime);
         }
     }
 

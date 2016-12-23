@@ -3,12 +3,12 @@
   "name": "asp.net",
   "private": true,
   "dependencies": {
-    "box2d": "^1.0.0",
-    "jquery": "3.1.1"
+    "jquery": "3.1.1",
+    "lodash": "4.17.2"
   },
   "devDependencies": {
-    "@types/box2d": "0.0.31",
     "@types/jquery": "^2.0.34",
+    "@types/lodash": "^4.14.44",
     "awesome-typescript-loader": "^3.0.0-beta.17",
     "source-map-loader": "^0.1.5",
     "typescript": "^2.1.4"

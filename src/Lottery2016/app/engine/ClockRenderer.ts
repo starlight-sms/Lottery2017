@@ -62,7 +62,7 @@ export class ClockRenderer extends RendererBase {
         return `${padding2(this.hour())}:${padding2(this.minute())}:${padding2(this.second())}`;
     }
 
-    render(time: number) {
+    render() {
         this.drawCircle();
         this.drawNumbers();
         this.drawCenterTime();

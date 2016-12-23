@@ -5,11 +5,9 @@
     "removeComments": false,
     "sourceMap": true,
     "target": "es5",
-    "module": "commonjs",
-    "strictNullChecks": true, 
+    "module": "amd",
     "lib": ["dom", "es5"]
   },
-  "compileOnSave": true, 
   "exclude": [
     "node_modules",
     "wwwroot"

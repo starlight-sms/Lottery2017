@@ -10,14 +10,14 @@ export class Scene extends RendererBase {
         return this.canvas;
     }
 
-    render(time: number) {
+    render(time: number, frameTime: number) {
         this.canvas.clear();
-        super.render(time);
+        super.render(time, frameTime);
     }
 
     constructor(canvasElement: HTMLCanvasElement) {
         super(new CanvasManager(<HTMLCanvasElement>document.querySelector("canvas")));
-        this.loop.onRender.connect(time => this.render(time));
-        this.loop.onUpdate.connect(time => this.update(time));
+        this.loop.onRender.connect(() => this.render(this.loop.totalRenderTime, this.loop.frameTime));
+        this.loop.onUpdate.connect(() => this.update(this.loop.totalRenderTime, this.loop.frameTime));
     }
 }

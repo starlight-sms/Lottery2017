@@ -21,11 +21,11 @@ class FpsContext {
 export class FpsRenderer extends RendererBase {
     private ctx = new FpsContext();
 
-    update(time: number) {
+    update(time: number, frameTime: number) {
         this.ctx.update(time);
     }
 
-    render(time: number) {
+    render(time: number, frameTime: number) {
         this.canvas.drawText(`FPS: ${this.ctx.fps.toFixed(0)}`, 0, 0, "blue");
     }
 }
