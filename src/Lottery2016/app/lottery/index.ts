@@ -27,7 +27,7 @@ export class LotteryRenderer extends RendererBase {
                 let angle = body.GetAngle();
 
                 this.canvas.save();
-                let scale = 0.01 * Math.min(this.canvas.width(), this.canvas.height());
+                let scale = 0.1 * Math.min(this.canvas.width(), this.canvas.height());
                 this.canvas.setTransform(float3x2
                     .rotation(angle)
                     .translation(pos.x, pos.y)
@@ -60,7 +60,7 @@ export class LotteryRenderer extends RendererBase {
                                         this.canvas.lineTo(shape.m_vertices[v].x, shape.m_vertices[v].y);
                                     }
                                     this.canvas.closePath();
-                                    this.canvas.stroke(`blue`);
+                                    this.canvas.stroke(person && person.Color || "black");
                                 }
                                 break;
                             default:

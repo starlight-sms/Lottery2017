@@ -10,7 +10,9 @@ import { b2CircleShape } from "./Box2D/Collision/Shapes/b2CircleShape";
 import * as KeyBoard from "../engine/KeyBoard";
 
 export class LotteryController {
-    world = new b2World(new b2Vec2(0, -100));
+    world = new b2World(new b2Vec2(
+        Math.random() > 0.5 ? 10 : -10,
+        Math.random() > 0.5 ? 10 : -10));
 
     GetBodies() {
         return rx.Observable.create<b2Body>(output => {
@@ -38,15 +40,12 @@ export class LotteryController {
 
         if (!KeyBoard.isKeyDown("p")) {
             this.world.Step(frameTime, velocityIterations, positionIterations);
-        }        
+        }
 
         if (KeyBoard.isKeyDown(" ")) {
-            this.GetBodies()
-                .filter(x => x.GetUserData() === null)
+            this.GetBorderBodies()
                 .subscribe(v => {
-                    v.SetType(b2BodyType.b2_unknown);
-                    
-                    //this.world.DestroyBody(v);
+                    v.SetType(b2BodyType.b2_dynamicBody);
                 });
         }
     }
@@ -64,46 +63,37 @@ export class LotteryController {
             groundBox.SetAsBox(w, h);
             groundBody.CreateFixture(groundBox, 0);
         }
-        CreateBorder(50, 25, 25, 0.2);
-        CreateBorder(25, 50, 0.2, 25);
-        CreateBorder(75, 50, 0.2, 25);
-        CreateBorder(50, 75, 25, 0.2);
+
+        CreateBorder(5, 0, 5, 0.2);
+        CreateBorder(0, 5, 0.02, 5);
+        CreateBorder(10, 5, 0.02, 5);
+        CreateBorder(5, 10, 5, 0.02);
 
         let CreateShapeAtRandom = (dto: Person) => {
+            dto.Color = `hsl(${Math.round(Math.random() * 360)}, 100%, 20%)`;
             // Define the dynamic body. We set its position and call the body factory.
             let bodyDef = new b2BodyDef();
             bodyDef.type = b2BodyType.b2_dynamicBody;
-            bodyDef.position.Set(Math.random() * 40 + 30, Math.random() * 40 + 30);
+            bodyDef.position.Set(Math.random() * 4 + 3, Math.random() * 4 + 3);
             let body = this.world.CreateBody(bodyDef);
             body.SetUserData(dto);
-            body.ApplyForce(
-                new b2Vec2(Math.random() * 100, Math.random() * 100),
-                new b2Vec2(1, 1), true);
 
             // Define another box shape for our dynamic body.
-            if (Math.random() > 0.5) {
-                let dynamicBox = new b2CircleShape(1.5)
-                let fixtureDef = new b2FixtureDef();
-                fixtureDef.shape = dynamicBox;
-                fixtureDef.density = 5;
-                fixtureDef.friction = 0;
-                fixtureDef.restitution = 1;
-                let fixture = body.CreateFixture(fixtureDef);
-            } else {
-                let dynamicBox = new b2PolygonShape();
-                dynamicBox.SetAsBox(2, 1);
-                let fixtureDef = new b2FixtureDef();
-                fixtureDef.shape = dynamicBox;
-                fixtureDef.density = 5;
-                fixtureDef.friction = 0;
-                fixtureDef.restitution = 1;
-                let fixture = body.CreateFixture(fixtureDef);
-            }
+            let dynamicBox = new b2PolygonShape();
+            dynamicBox.SetAsBox(0.2, 0.1);
+            let fixtureDef = new b2FixtureDef();
+            fixtureDef.shape = dynamicBox;
+            fixtureDef.density = 5;
+            fixtureDef.friction = 0;
+            fixtureDef.restitution = 1;
+            let fixture = body.CreateFixture(fixtureDef);
         }
 
-        api.getUnluckyPersons().forEach(v => {
-            console.log(v);
-            CreateShapeAtRandom(v);
-        });
+        Rx.Observable.fromArray(api.getUnluckyPersons())
+            .take(110)
+            .subscribe(v => {
+                console.log(v);
+                CreateShapeAtRandom(v);
+            });
     }
 }

@@ -3,6 +3,7 @@
 export interface Person {
     Id: number;
     Name: string;
+    Color?: string;
 }
 
 class Api {
