@@ -27,12 +27,11 @@ export class LotteryRenderer extends RendererBase {
                 let angle = body.GetAngle();
 
                 this.canvas.save();
-                let scale = 0.1 * Math.min(this.canvas.width(), this.canvas.height());
+                let scale = 0.1 * Math.min(this.canvas.width(), this.canvas.height()) / 2;
                 this.canvas.setTransform(float3x2
                     .rotation(angle)
                     .translation(pos.x, pos.y)
                     .scale(scale, scale));
-                this.canvas.lineWidth = 1 / scale;
 
                 let person = <Person>body.GetUserData();
 
@@ -60,7 +59,7 @@ export class LotteryRenderer extends RendererBase {
                                         this.canvas.lineTo(shape.m_vertices[v].x, shape.m_vertices[v].y);
                                     }
                                     this.canvas.closePath();
-                                    this.canvas.stroke(person && person.Color || "black");
+                                    this.canvas.stroke(person && person.Color || "black", 1 / scale);
                                 }
                                 break;
                             default:
@@ -68,18 +67,25 @@ export class LotteryRenderer extends RendererBase {
                                 break;
                         }
                     });
-                this.canvas.restore();
                 
                 if (person !== null) {
                     let text = this.getTextCanvas(person.Name.toString());
                     this.canvas.save();
                     this.canvas.setTransform(float3x2
-                        .rotation(angle, pos.x * scale, pos.y * scale));
+                        .scale(scale / 95, scale / 95, text.width / 2, text.height / 2)
+                        .rotation(angle, text.width / 2, text.height / 2)
+                        .translation(
+                            pos.x * scale - text.width / 2, 
+                            pos.y * scale - text.height / 2)
+                        );
                     this.canvas.ctx.drawImage(text,
-                        pos.x * scale - text.width / 3,
-                        pos.y * scale - text.height / 2);
+                        0, 
+                        0);
+                    this.canvas.strokeRect(0, 0, text.width, text.height, "red");
+                    
                     this.canvas.restore();
                 }
+                this.canvas.restore();
             });
     }
 
@@ -89,12 +95,12 @@ export class LotteryRenderer extends RendererBase {
         let canvas = this.textCache[text];
         if (canvas === undefined) {
             canvas = document.createElement("canvas");
-            canvas.width = this.canvas.ctx.measureText(text).width;
-            canvas.height = 14;
 
+            canvas.width = 80;
+            canvas.height = 28;
             let ctx = new CanvasManager(canvas);
-            ctx.font = "12px Consolas";
-            ctx.drawText(text, 0, 0, `black`);
+            ctx.font = "24px 微软雅黑";
+            ctx.drawText(text, ctx.width() / 2 - ctx.ctx.measureText(text).width / 2, 0, `black`);
             this.textCache[text] = canvas;
         }
         return canvas;
