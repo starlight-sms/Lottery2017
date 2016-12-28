@@ -10,7 +10,7 @@ import { b2CircleShape } from "./Box2D/Collision/Shapes/b2CircleShape";
 import * as KeyBoard from "../engine/KeyBoard";
 
 export class LotteryController {
-    world = new b2World(new b2Vec2(0, 5));
+    world = new b2World(new b2Vec2(0, 10));
 
     GetBodies() {
         return rx.Observable.create<b2Body>(output => {
@@ -64,7 +64,7 @@ export class LotteryController {
 
         CreateBorder(5, 0, 5, 0.2);
         CreateBorder(0, 5, 0.02, 5);
-        CreateBorder(10, 5, 0.02, 5);
+        CreateBorder(10, 5.5, 0.02, 4.5);
         CreateBorder(5, 10, 5, 0.02);
 
         let CreateShapeAtRandom = (dto: Person) => {
@@ -78,7 +78,7 @@ export class LotteryController {
 
             // Define another box shape for our dynamic body.
             let dynamicBox = new b2PolygonShape();
-            dynamicBox.SetAsBox(0.4, 0.2);
+            dynamicBox.SetAsBox(0.3, 0.15);
             let fixtureDef = new b2FixtureDef();
             fixtureDef.shape = dynamicBox;
             fixtureDef.density = 5;

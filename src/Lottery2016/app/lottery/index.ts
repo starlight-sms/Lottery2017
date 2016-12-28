@@ -27,7 +27,7 @@ export class LotteryRenderer extends RendererBase {
                 let angle = body.GetAngle();
 
                 this.canvas.save();
-                let scale = 0.1 * Math.min(this.canvas.width(), this.canvas.height()) / 2;
+                let scale = 0.1 * Math.min(this.canvas.width(), this.canvas.height());
                 this.canvas.setTransform(float3x2
                     .rotation(angle)
                     .translation(pos.x, pos.y)
@@ -97,9 +97,9 @@ export class LotteryRenderer extends RendererBase {
             canvas = document.createElement("canvas");
 
             canvas.width = 80;
-            canvas.height = 28;
+            canvas.height = 14;
             let ctx = new CanvasManager(canvas);
-            ctx.font = "24px 微软雅黑";
+            ctx.font = "12px 微软雅黑";
             ctx.drawText(text, ctx.width() / 2 - ctx.ctx.measureText(text).width / 2, 0, `black`);
             this.textCache[text] = canvas;
         }
