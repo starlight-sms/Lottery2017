@@ -2,9 +2,10 @@
 
 class Scene;
 class MainWindowRes;
+class FlashImageScene;
 #include "DxRes.h"
 
-class MainWindow : public CFrameWnd
+class MainWindow final: public CFrameWnd, public DxRes
 {
 public:
 	MainWindow();
@@ -30,15 +31,9 @@ private:
 	size_t GetLotteryId();
 	std::vector<std::unique_ptr<Scene>> _scenes;
 
-	std::unique_ptr<MainWindowRes> _dxRes;
-};
-
-class MainWindowRes : public DxRes
-{
-public:
+	// dxres
 	std::vector<CD2DBitmap*> LotteryBitmaps;
 	CD2DSolidColorBrush* Blue;
-
 	virtual void CreateDeviceResources(CHwndRenderTarget * target) override;
 	virtual void CreateDeviceSizeResources(CHwndRenderTarget * target) override;
 };

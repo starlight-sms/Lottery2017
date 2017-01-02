@@ -19,6 +19,9 @@
     <ClCompile Include="Person.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Box2dScene.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resources">
@@ -29,9 +32,6 @@
     </Filter>
     <Filter Include="Sources">
       <UniqueIdentifier>{5ea13ef9-c6bd-445d-abeb-b4d6626813c4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="dx">
-      <UniqueIdentifier>{0fc17c6e-c746-4b0c-8c5e-1ea98dab8f78}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -54,6 +54,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Person.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Box2dScene.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

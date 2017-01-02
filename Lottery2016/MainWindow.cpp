@@ -4,6 +4,7 @@
 #include "Resources\resource.h"
 #include "Person.h"
 #include "FlashImageScene.h"
+#include "Box2dScene.h"
 #include "DxRes.h"
 
 using D2D1::ColorF;
@@ -50,9 +51,9 @@ void MainWindow::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void MainWindow::OnSize(UINT nType, int cx, int cy)
 {
-	if (nType != SIZE_MINIMIZED && _dxRes)
+	if (nType != SIZE_MINIMIZED && GetRenderTarget())
 	{
-		_dxRes->CreateDeviceSizeResources(GetRenderTarget());
+		CreateDeviceSizeResources(GetRenderTarget());
 	}
 }
 
@@ -139,9 +140,8 @@ int MainWindow::OnCreate(LPCREATESTRUCT cs)
 
 	// d2d
 	EnableD2DSupport();
-	_dxRes = make_unique<MainWindowRes>();
-	CreateDeviceResources(0, (LPARAM)GetRenderTarget());
-	_dxRes->CreateDeviceSizeResources(GetRenderTarget());
+	CreateDeviceResources(GetRenderTarget());
+	CreateDeviceSizeResources(GetRenderTarget());
 
 	CreateScene(GetItems()[0].Count, 0, GetUnluckyPersonIds());
 
@@ -168,34 +168,41 @@ LRESULT MainWindow::OnDraw2D(WPARAM, LPARAM lparam)
 	GetClientRect(&rect);
 	CD2DRectF d2dRect{ (float)rect.left, (float)rect.top, (float)rect.right, (float)rect.bottom };
 
-	target->DrawBitmap(_dxRes->LotteryBitmaps[GetLotteryId()], d2dRect);
-
-	SYSTEMTIME st;
-	GetLocalTime(&st);
-	CString str;
-	str.Format(L"%d", st.wMilliseconds);
-	target->DrawTextW(str, d2dRect, _dxRes->Blue);
+	target->DrawBitmap(LotteryBitmaps[GetLotteryId()], d2dRect);
 
 	for (auto& scene : _scenes)
 	{
 		scene->Render(target);
 	}
 
+	SYSTEMTIME st;
+	GetLocalTime(&st);
+	CString str;
+	str.Format(L"%d", st.wMilliseconds);
+	target->DrawTextW(str, d2dRect, Blue);
+
 	return TRUE;
 }
 
 LRESULT MainWindow::CreateDeviceResources(WPARAM, LPARAM lparam)
 {
-	_dxRes->CreateDeviceResources((CHwndRenderTarget*)lparam);
+	CreateDeviceResources((CHwndRenderTarget*)lparam);
 	return 0;
 }
 
 void MainWindow::CreateScene(int count, int itemId, const std::vector<int>& personIds)
 {
-	auto scene = make_unique<FlashImageScene>(count, itemId, personIds);
-	scene->CreateDeviceResources(GetRenderTarget());
-	scene->CreateDeviceSizeResources(GetRenderTarget());
-	_scenes.emplace_back(move(scene));
+	{
+		_scenes.emplace_back(make_unique<FlashImageScene>(count, itemId, personIds));
+		(*_scenes.rbegin())->CreateDeviceResources(GetRenderTarget());
+		(*_scenes.rbegin())->CreateDeviceSizeResources(GetRenderTarget());
+	}
+
+	{
+		_scenes.emplace_back(make_unique<Box2dScene>(count, itemId, personIds));
+		(*_scenes.rbegin())->CreateDeviceResources(GetRenderTarget());
+		(*_scenes.rbegin())->CreateDeviceSizeResources(GetRenderTarget());
+	}
 }
 
 size_t MainWindow::GetLotteryId()
@@ -210,7 +217,7 @@ size_t MainWindow::GetLotteryId()
 	return 0;
 }
 
-void MainWindowRes::CreateDeviceResources(CHwndRenderTarget * target)
+void MainWindow::CreateDeviceResources(CHwndRenderTarget * target)
 {
 	for (size_t i = 0; i < GetItems().size(); ++i)
 	{
@@ -221,6 +228,6 @@ void MainWindowRes::CreateDeviceResources(CHwndRenderTarget * target)
 	Blue = new CD2DSolidColorBrush(target, ColorF(ColorF::Blue));
 }
 
-void MainWindowRes::CreateDeviceSizeResources(CHwndRenderTarget * target)
+void MainWindow::CreateDeviceSizeResources(CHwndRenderTarget * target)
 {
 }

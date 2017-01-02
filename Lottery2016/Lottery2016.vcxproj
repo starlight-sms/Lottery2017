@@ -153,6 +153,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="App.cpp" />
+    <ClCompile Include="Box2dScene.cpp" />
     <ClCompile Include="FlashImageScene.cpp" />
     <ClCompile Include="Items.cpp" />
     <ClCompile Include="MainWindow.cpp" />
@@ -165,6 +166,7 @@
     <ClCompile Include="Person.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Box2dScene.h" />
     <ClInclude Include="DxRes.h" />
     <ClInclude Include="FlashImageScene.h" />
     <ClInclude Include="Items.h" />
