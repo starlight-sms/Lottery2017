@@ -254,3 +254,4 @@ paket-files/
 *.js.map
 /src/Lottery2016/app/lottery/allPerson.ts
 *.jpg
+*.txt

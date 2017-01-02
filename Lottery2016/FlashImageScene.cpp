@@ -5,14 +5,16 @@
 #include "Person.h"
 
 using namespace std;
+using D2D1::ColorF;
 
 CD2DSizeF Divide(CD2DSizeF v, float x, float y);
 CD2DSizeF Multiple(CD2DSizeF v, float x, float y);
 CD2DSizeF GetDisplaySize(const CD2DSizeF& inputSize, const CD2DSizeF& clampSize);
 CD2DRectF GetDrawCenterRect(const CD2DSizeF& topLeft, const CD2DSizeF& gridSize, const CD2DSizeF& realSize);
 
-FlashImageScene::FlashImageScene(int count, std::vector<int> persons) :
+FlashImageScene::FlashImageScene(int count, int itemId, std::vector<int> persons) :
 	_count(count),
+	_itemId(itemId), 
 	_allPersonIds(move(persons)),
 	_mt19937(random_device()())
 {
@@ -22,7 +24,7 @@ FlashImageScene::FlashImageScene(int count, std::vector<int> persons) :
 	}
 }
 
-void FlashImageScene::Step()
+void FlashImageScene::Update()
 {
 	if (_started)
 	{
@@ -31,26 +33,7 @@ void FlashImageScene::Step()
 	}	
 }
 
-const std::vector<int>& FlashImageScene::GetSelectedPersonIds() const
-{
-	return _selectedPersonIds;
-}
-
-bool FlashImageScene::Toggle()
-{
-	if (_started)
-	{
-		_started = false;
-	}
-	else if (!IsCompleted())
-	{
-		_started = true;
-	}
-
-	return IsCompleted();
-}
-
-void FlashImageScene::Render(CHwndRenderTarget * target, DxRes * dxRes)
+void FlashImageScene::Render(CHwndRenderTarget * target)
 {
 	auto windowSize = target->GetSize();
 	auto whRate = windowSize.width / windowSize.height;
@@ -63,7 +46,7 @@ void FlashImageScene::Render(CHwndRenderTarget * target, DxRes * dxRes)
 	{
 		auto id = _selectedPersonIds[i];
 		auto topLeft = Multiple(gridSize, (float)col, (float)row);
-		auto bmp = dxRes->PersonBitmaps[id];
+		auto bmp = _personBitmaps[id];
 		auto realSize = GetDisplaySize(bmp->GetSize(), gridSize);
 
 		auto rect = GetDrawCenterRect(topLeft, gridSize, realSize);
@@ -74,7 +57,7 @@ void FlashImageScene::Render(CHwndRenderTarget * target, DxRes * dxRes)
 			str.Append(L"\r\n");
 			str.Append(GetAllPerson()[id].Notes);
 		}
-		target->DrawTextW(str, rect, dxRes->Blue, dxRes->TextFormat);
+		target->DrawTextW(str, rect, _blue, _textFormat);
 
 		++col;
 		row += col / maxCol;
@@ -82,9 +65,42 @@ void FlashImageScene::Render(CHwndRenderTarget * target, DxRes * dxRes)
 	}
 }
 
-bool FlashImageScene::IsCompleted()
+void FlashImageScene::KeyUp(UINT key)
 {
-	return !_started && _selectedPersonIds.size() > 0;
+	if (key == VK_SPACE)
+	{
+		if (_started)
+		{
+			_started = false;
+			// save...
+			SaveLuckyPersonIds(_itemId, _selectedPersonIds);
+		}
+		else if (_selectedPersonIds.size() == 0)
+		{
+			_started = true;
+		}
+	}
+}
+
+void FlashImageScene::CreateDeviceResources(CHwndRenderTarget * target)
+{
+	for (size_t i = 0; i < GetAllPerson().size(); ++i)
+	{
+		_personBitmaps.push_back(new CD2DBitmap(target, GetAllPerson()[i].ResourceId, L"Person"));
+		HR((*_personBitmaps.rbegin())->Create(target));
+	}
+	_blue = new CD2DSolidColorBrush(target, ColorF(ColorF::Blue));
+}
+
+void FlashImageScene::CreateDeviceSizeResources(CHwndRenderTarget * target)
+{
+	if (_textFormat)
+		_textFormat->Destroy();
+
+	auto size = target->GetSize();
+	auto minEdge = std::min(size.width, size.height);
+	auto real = b2Clamp(minEdge / 40, 12.0f, 24.0f);
+	_textFormat = new CD2DTextFormat(target, L"Consolas", real);
 }
 
 CD2DSizeF Divide(CD2DSizeF v, float x, float y)

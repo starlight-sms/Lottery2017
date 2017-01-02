@@ -34,21 +34,17 @@ MainWindow::MainWindow()
 
 void MainWindow::Update()
 {
-	if (_scene)
+	for (auto& scene : _scenes)
 	{
-		_scene->Step();
+		scene->Update();
 	}
 }
 
 void MainWindow::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	if (nChar == VK_SPACE)
+	for (auto& scene : _scenes)
 	{
-		auto completed = _scene->Toggle();
-		if (completed)
-		{
-			SaveLuckyPersonIds(GetLotteryId(), _scene->GetSelectedPersonIds());
-		}
+		scene->KeyUp(nChar);
 	}
 }
 
@@ -98,7 +94,8 @@ void MainWindow::OnLottery(UINT id)
 
 	_menu.CheckMenuRadioItem(MenuLotteryStart, MenuLotteryLast(), id, MF_BYCOMMAND);
 
-	_scene = make_unique<FlashImageScene>(needCount, unluckyIds);
+	_scenes.clear();
+	CreateScene(needCount, itemId, unluckyIds);
 }
 
 void MainWindow::OnStatus(UINT id)
@@ -138,14 +135,15 @@ int MainWindow::OnCreate(LPCREATESTRUCT cs)
 	_menu.GetSubMenu(2)->AppendMenuW(MF_SEPARATOR);
 	_menu.GetSubMenu(2)->AppendMenuW(MF_STRING, MenuStatusClear(), L"Çå³ý×´Ì¬(&C)");
 	_menu.CheckMenuRadioItem(MenuLotteryStart, MenuLotteryLast(), MenuLotteryStart, MF_BYCOMMAND);
-	_scene = make_unique<FlashImageScene>(GetItems()[0].Count, GetUnluckyPersonIds());
 	SetMenu(&_menu);
 
 	// d2d
 	EnableD2DSupport();
-	_dxRes = make_unique<DxRes>();
+	_dxRes = make_unique<MainWindowRes>();
 	CreateDeviceResources(0, (LPARAM)GetRenderTarget());
 	_dxRes->CreateDeviceSizeResources(GetRenderTarget());
+
+	CreateScene(GetItems()[0].Count, 0, GetUnluckyPersonIds());
 
 	return TRUE;
 }
@@ -178,7 +176,10 @@ LRESULT MainWindow::OnDraw2D(WPARAM, LPARAM lparam)
 	str.Format(L"%d", st.wMilliseconds);
 	target->DrawTextW(str, d2dRect, _dxRes->Blue);
 
-	_scene->Render(target, _dxRes.get());
+	for (auto& scene : _scenes)
+	{
+		scene->Render(target);
+	}
 
 	return TRUE;
 }
@@ -187,6 +188,14 @@ LRESULT MainWindow::CreateDeviceResources(WPARAM, LPARAM lparam)
 {
 	_dxRes->CreateDeviceResources((CHwndRenderTarget*)lparam);
 	return 0;
+}
+
+void MainWindow::CreateScene(int count, int itemId, const std::vector<int>& personIds)
+{
+	auto scene = make_unique<FlashImageScene>(count, itemId, personIds);
+	scene->CreateDeviceResources(GetRenderTarget());
+	scene->CreateDeviceSizeResources(GetRenderTarget());
+	_scenes.emplace_back(move(scene));
 }
 
 size_t MainWindow::GetLotteryId()
@@ -199,4 +208,19 @@ size_t MainWindow::GetLotteryId()
 		}
 	}
 	return 0;
+}
+
+void MainWindowRes::CreateDeviceResources(CHwndRenderTarget * target)
+{
+	for (size_t i = 0; i < GetItems().size(); ++i)
+	{
+		LotteryBitmaps.push_back(new CD2DBitmap(target, GetItems()[i].ResourceId, L"Item"));
+		HR((*LotteryBitmaps.rbegin())->Create(target));
+	}
+
+	Blue = new CD2DSolidColorBrush(target, ColorF(ColorF::Blue));
+}
+
+void MainWindowRes::CreateDeviceSizeResources(CHwndRenderTarget * target)
+{
 }

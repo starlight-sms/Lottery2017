@@ -4,9 +4,6 @@
     <ClCompile Include="App.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="DxRes.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
     <ClCompile Include="FlashImageScene.cpp">
       <Filter>Sources</Filter>
     </ClCompile>

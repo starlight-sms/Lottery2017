@@ -1,7 +1,8 @@
 #pragma once
 
-class FlashImageScene;
-class DxRes;
+class Scene;
+class MainWindowRes;
+#include "DxRes.h"
 
 class MainWindow : public CFrameWnd
 {
@@ -22,10 +23,22 @@ private:
 	LRESULT OnDraw2D(WPARAM, LPARAM);
 
 	LRESULT CreateDeviceResources(WPARAM, LPARAM);
+
+	void CreateScene(int count, int itemId, const std::vector<int>& personIds);
 		
 	CMenu _menu;	
 	size_t GetLotteryId();
-	std::unique_ptr<FlashImageScene> _scene;
+	std::vector<std::unique_ptr<Scene>> _scenes;
 
-	std::unique_ptr<DxRes> _dxRes;
+	std::unique_ptr<MainWindowRes> _dxRes;
+};
+
+class MainWindowRes : public DxRes
+{
+public:
+	std::vector<CD2DBitmap*> LotteryBitmaps;
+	CD2DSolidColorBrush* Blue;
+
+	virtual void CreateDeviceResources(CHwndRenderTarget * target) override;
+	virtual void CreateDeviceSizeResources(CHwndRenderTarget * target) override;
 };

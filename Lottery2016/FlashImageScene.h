@@ -1,20 +1,37 @@
 #pragma once
 
-class DxRes;
+#include "DxRes.h"
 
-class FlashImageScene
+class Scene : public DxRes
 {
 public:
-	FlashImageScene(int count, std::vector<int> personIds);
-	void Step();
-	const std::vector<int>& GetSelectedPersonIds() const;
-	bool Toggle();
-	void Render(CHwndRenderTarget* target, DxRes* dxRes);
+	virtual void Update() = 0;
+	virtual void Render(CHwndRenderTarget* target) = 0;
+	virtual void KeyUp(UINT key) = 0;
+};
+
+class FlashImageScene : public Scene
+{
+public:
+	FlashImageScene(int count, int itemId, std::vector<int> personIds);
+	// overrides
+	virtual void Update() override;
+	virtual void CreateDeviceResources(CHwndRenderTarget * target) override;
+	virtual void CreateDeviceSizeResources(CHwndRenderTarget * target) override;
+	virtual void Render(CHwndRenderTarget* target) override;
+	virtual void KeyUp(UINT key) override;
 private:
-	bool IsCompleted();
+	const size_t _count;
+	const int _itemId;
+
 	bool _started = false;
 	std::mt19937 _mt19937;
-	const size_t _count;
+	
 	std::vector<int> _allPersonIds;
-	std::vector<int> _selectedPersonIds;
+	std::vector<int> _selectedPersonIds;	
+
+	// dxres
+	std::vector<CD2DBitmap*> _personBitmaps;
+	CD2DTextFormat* _textFormat = nullptr;
+	CD2DSolidColorBrush* _blue;
 };
