@@ -179,7 +179,7 @@ LRESULT MainWindow::OnDraw2D(WPARAM, LPARAM lparam)
 	GetLocalTime(&st);
 	CString str;
 	str.Format(L"%d", st.wMilliseconds);
-	target->DrawTextW(str, d2dRect, Blue);
+	target->DrawTextW(str, d2dRect, _brush);
 
 	return TRUE;
 }
@@ -225,9 +225,13 @@ void MainWindow::CreateDeviceResources(CHwndRenderTarget * target)
 		HR((*LotteryBitmaps.rbegin())->Create(target));
 	}
 
-	Blue = new CD2DSolidColorBrush(target, ColorF(ColorF::Blue));
+	_brush = new CD2DSolidColorBrush(target, ColorF(ColorF::Yellow));
 }
 
 void MainWindow::CreateDeviceSizeResources(CHwndRenderTarget * target)
 {
+	for (auto & scene : _scenes)
+	{
+		scene->CreateDeviceSizeResources(target);
+	}
 }

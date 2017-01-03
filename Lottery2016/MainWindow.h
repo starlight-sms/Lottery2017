@@ -33,7 +33,7 @@ private:
 
 	// dxres
 	std::vector<CD2DBitmap*> LotteryBitmaps;
-	CD2DSolidColorBrush* Blue;
+	CD2DSolidColorBrush* _brush;
 	virtual void CreateDeviceResources(CHwndRenderTarget * target) override;
 	virtual void CreateDeviceSizeResources(CHwndRenderTarget * target) override;
 };

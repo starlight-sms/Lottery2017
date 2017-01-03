@@ -41,15 +41,18 @@ void FlashImageScene::Render(CHwndRenderTarget * target)
 	auto maxRow = (int)ceil(1.0 * _count / maxCol);
 		
 	auto gridSize = Divide(windowSize, (float)maxCol, (float)maxRow);
+	auto lastCol = _count - (maxRow - 1) * maxCol;
+	auto lastGridSize = Divide(windowSize, (float)lastCol, (float)maxRow);
 
 	for (size_t i = 0, col = 0, row = 0; i < _selectedPersonIds.size(); ++i)
 	{
 		auto id = _selectedPersonIds[i];
-		auto topLeft = Multiple(gridSize, (float)col, (float)row);
+		auto grid = (int)row < maxRow - 1 ? gridSize : lastGridSize;
+		auto topLeft = Multiple(grid, (float)col, (float)row);
 		auto bmp = _personBitmaps[id];
-		auto realSize = GetDisplaySize(bmp->GetSize(), gridSize);
-
-		auto rect = GetDrawCenterRect(topLeft, gridSize, realSize);
+		
+		auto realSize = GetDisplaySize(bmp->GetSize(), grid);
+		auto rect = GetDrawCenterRect(topLeft, grid, realSize);
 		target->DrawBitmap(bmp, rect);
 		CString str = GetAllPerson()[id].Name;
 		if (!_started)
@@ -59,8 +62,7 @@ void FlashImageScene::Render(CHwndRenderTarget * target)
 		}
 		target->DrawTextW(str, rect, _blue, _textFormat);
 
-		++col;
-		row += col / maxCol;
+		row += ++col / maxCol;
 		col = col % maxCol;
 	}
 }
@@ -79,15 +81,20 @@ void FlashImageScene::KeyUp(UINT key)
 		{
 			_started = true;
 		}
+		else
+		{
+			AfxGetMainWnd()->MessageBoxW(L"此奖项已抽奖完成，可在以下位置开始新的抽奖：\n菜单->抽奖->选择奖项。");
+		}
 	}
 }
 
 void FlashImageScene::CreateDeviceResources(CHwndRenderTarget * target)
 {
-	for (size_t i = 0; i < GetAllPerson().size(); ++i)
+	for (size_t i = 0; i < _allPersonIds.size(); ++i)
 	{
-		_personBitmaps.push_back(new CD2DBitmap(target, GetAllPerson()[i].ResourceId, L"Person"));
-		HR((*_personBitmaps.rbegin())->Create(target));
+		auto id = _allPersonIds[i];
+		_personBitmaps[id] = new CD2DBitmap(target, GetAllPerson()[i].ResourceId, L"Person");
+		HR(_personBitmaps[id]->Create(target));
 	}
 	_blue = new CD2DSolidColorBrush(target, ColorF(ColorF::Blue));
 }

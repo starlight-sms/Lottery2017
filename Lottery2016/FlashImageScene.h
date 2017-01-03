@@ -31,7 +31,7 @@ private:
 	std::vector<int> _selectedPersonIds;	
 
 	// dxres
-	std::vector<CD2DBitmap*> _personBitmaps;
+	std::unordered_map<int, CD2DBitmap*> _personBitmaps;
 	CD2DTextFormat* _textFormat = nullptr;
 	CD2DSolidColorBrush* _blue;
 };
