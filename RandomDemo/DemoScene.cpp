@@ -6,6 +6,12 @@ using namespace std;
 using D2D1::ColorF;
 using D2D1::Matrix3x2F;
 
+ref class Test
+{
+public:
+	static System::Random ^r = gcnew System::Random(System::Guid::NewGuid().GetHashCode());
+};
+
 void RandomDemoScene::CreateDeviceResources(CHwndRenderTarget *target)
 {
 	_brush = new CD2DSolidColorBrush(target, ColorF(ColorF::Black));
@@ -34,9 +40,8 @@ void RandomDemoScene::Render(CHwndRenderTarget * target)
 ;
 void RandomDemoScene::Update()
 {
-	if (_points.size() > 50000) return;
-
-	for (auto i = 0; i < 100; ++i)
+	_points.clear();
+	for (auto i = 0; i < 50000; ++i)
 	{
 		_points.push_back(GetNextRand());
 	}
@@ -56,13 +61,15 @@ std::unique_ptr<RandomDemoScene> RandomDemoScene::Make(int type)
 		return make_unique<MinstdRandDemoScene>();
 	case ID_TEST_RANLUX:
 		return make_unique<RanluxDemoScene>();
+	case ID_TEST_CSRANDOM:
+		return make_unique<CSDemoScene>();
 	}
 	throw make_exception_ptr("unknown type");
 }
 
 UINT RandDemoScene::GetNextRand()
 {
-	return UINT((rand() + rand()) << 16) + (rand() + rand());
+	return (rand() << 17) + (rand() * 2);
 }
 
 UINT RdDemoScene::GetNextRand()
@@ -82,5 +89,10 @@ UINT RanluxDemoScene::GetNextRand()
 
 UINT MinstdRandDemoScene::GetNextRand()
 {
-	return _rd() + _rd();
+	return _rd() * 2;
+}
+
+UINT CSDemoScene::GetNextRand()
+{
+	return (UINT)Test::r->Next() * 2;
 }

@@ -225,7 +225,7 @@ void MainWindow::CreateDeviceResources(CHwndRenderTarget * target)
 		HR((*LotteryBitmaps.rbegin())->Create(target));
 	}
 
-	_brush = new CD2DSolidColorBrush(target, ColorF(ColorF::Yellow));
+	_brush = new CD2DSolidColorBrush(target, ColorF(ColorF::Green));
 }
 
 void MainWindow::CreateDeviceSizeResources(CHwndRenderTarget * target)

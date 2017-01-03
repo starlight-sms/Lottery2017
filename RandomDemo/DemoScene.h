@@ -53,3 +53,9 @@ class MinstdRandDemoScene : public RandomDemoScene
 	virtual UINT GetNextRand() override;
 	std::minstd_rand _rd{ std::random_device()() };
 };
+
+class CSDemoScene : public RandomDemoScene
+{
+	// Í¨¹ý DemoScene ¼Ì³Ð
+	virtual UINT GetNextRand() override;
+};
