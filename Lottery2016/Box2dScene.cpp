@@ -13,7 +13,7 @@ using namespace DirectX;
 CD2DPointF ToD2DPoint(const b2Vec2& v);
 
 Box2dScene::Box2dScene(int count, int itemId, const std::vector<int>& personIds) :
-	LotteryScene(count, itemId, personIds), 
+	LotteryScene(count, itemId, personIds),
 	_world{ b2Vec2{0, 10} },
 	_state{ State::Pending }
 {
@@ -93,20 +93,41 @@ void Box2dScene::Render(CHwndRenderTarget * target)
 		auto shape = (b2PolygonShape*)border->GetFixtureList()->GetShape();
 		target->FillGeometry(GetOrCreateBorderGeometry(target, length), GetColorBrush(target, _borderColor));
 	}
-	for (auto person : _personBodies)
+
+	auto H = PersonSize / 2;
+	for (auto personBody : _personBodies)
 	{
-		PreRenderBody(target, person);
-		auto shape = (b2PolygonShape*)person->GetFixtureList()->GetShape();
-		auto userId = (int)person->GetUserData();
+		PreRenderBody(target, personBody);
+		auto shape = (b2PolygonShape*)personBody->GetFixtureList()->GetShape();
+		auto userId = (int)personBody->GetUserData();
 		auto brush = _personBrushes[userId];
-		auto H = PersonSize / 2;
 		target->FillRectangle({ -H, -H, H, H }, brush);
 
+		auto color = GetColorBrush(target, _luckyColor);
 		if (_luckyPersonIds.find(userId) != _luckyPersonIds.end())
 		{
-			target->DrawRectangle({ -H, -H, H, H }, GetColorBrush(target, _luckyColor), 3 / _scale);
+			target->DrawRectangle({ -H, -H, H, H }, color, 3 / _scale);
+
+			target->SetTransform(Matrix3x2F::Identity());
+
+			auto person = GetAllPerson()[userId];
+			auto X = personBody->GetPosition().x * _scale;
+			auto Y = personBody->GetPosition().y * _scale;
+
+			CD2DRectF nameRect{
+				X - _scale * 1.5f,
+				Y - 20,
+				X, Y + 300 };
+			target->DrawTextW(person.Name, nameRect, color, _headerTextFormat);
+
+			CD2DRectF notesRect{
+				X - _scale * 4,
+				Y,
+				X,Y + 300 };
+			target->DrawTextW(person.Notes, notesRect, color, _textFormat);
 		}
 	}
+
 	target->SetTransform(Matrix3x2F::Identity());
 }
 
@@ -221,7 +242,7 @@ void Box2dScene::EnterTriggerMode()
 
 	_borders.push_back(CreateBorderBody(A, A61, P2, A3));
 	_borders.push_back(CreateBorderBody(A, A65, P2, A3));
-	_borders.push_back(CreateBorderBody(A + H, H, P2, A));
+	_borders.push_back(CreateBorderBody(A + H, H, P2, A*0.9f));
 }
 
 RectangleGeometry * Box2dScene::GetOrCreateBorderGeometry(CHwndRenderTarget* target, float length)
