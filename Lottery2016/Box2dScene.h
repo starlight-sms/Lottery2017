@@ -17,6 +17,7 @@ public:
 private:
 	const float RelativeSize = 10.0f;
 	const float BorderWidth = RelativeSize / 100;
+	const float PersonSize = 0.40f;
 	const int _count;
 	const int _itemId;
 	bool _show = false;
@@ -33,7 +34,6 @@ private:
 	std::vector<b2Body*> _personBodies;
 	b2World _world;
 	int _updateCount = 0;
-	const float CircleSize = 0.25;
 
 	b2Body* CreateBorderBody(float x, float y, float angle);
 	b2Body* CreatePersonBody(int personId);

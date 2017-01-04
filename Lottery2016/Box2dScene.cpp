@@ -16,7 +16,7 @@ Box2dScene::Box2dScene(int count, int itemId, const std::vector<int>& personIds)
 	_count(count),
 	_itemId(count),
 	_allPersonIds(personIds),
-	_world{ b2Vec2{0, 5} }
+	_world{ b2Vec2{0, 10} }
 {
 	{
 		auto H = RelativeSize / 2;
@@ -36,7 +36,7 @@ Box2dScene::Box2dScene(int count, int itemId, const std::vector<int>& personIds)
 
 void Box2dScene::CreateDeviceResources(CHwndRenderTarget * target)
 {
-	_borderBrush = new CD2DSolidColorBrush(target, ColorF(ColorF::Yellow));
+	_borderBrush = new CD2DSolidColorBrush(target, ColorF(ColorF::LightGray));
 	for (auto i : _allPersonIds)
 	{
 		_personBrushes[i] = new CD2DBitmapBrush(target, GetAllPerson()[i].ResourceId, L"Person");
@@ -59,12 +59,13 @@ void Box2dScene::CreateDeviceSizeResources(CHwndRenderTarget * target)
 	for (auto i : _allPersonIds)
 	{
 		auto bitmapSize = _personBrushes[i]->GetBitmap()->GetPixelSize();
-		auto minEdge = std::min(bitmapSize.width, bitmapSize.height);
+		auto minEdge = (float)std::min(bitmapSize.width, bitmapSize.height);
 		auto transform =
 			Matrix3x2F::Translation(
 				-float(bitmapSize.width - minEdge) / 2,
 				-float(bitmapSize.height - minEdge) / 2) *
-			Matrix3x2F::Scale(CircleSize / minEdge / 2, CircleSize / minEdge / 2);
+			Matrix3x2F::Translation(-minEdge / 2, -minEdge / 2) *
+			Matrix3x2F::Scale(PersonSize * 2 / minEdge, PersonSize * 2 / minEdge);
 		_personBrushes[i]->SetTransform(&transform);
 	}
 }
@@ -93,10 +94,11 @@ void Box2dScene::Render(CHwndRenderTarget * target)
 	for (auto person : _personBodies)
 	{
 		PreRenderBody(target, person);
-		auto shape = (b2CircleShape*)person->GetFixtureList()->GetShape();
-		CD2DEllipse ellipse{ {0.f, 0.f}, {shape->m_radius, shape->m_radius} };
+		auto shape = (b2PolygonShape*)person->GetFixtureList()->GetShape();
 		auto userId = (int)person->GetUserData();
-		target->FillEllipse(ellipse, _personBrushes[userId]);
+		auto brush = _personBrushes[userId];
+		auto H = PersonSize / 2;
+		target->FillRectangle({ -H, -H, H, H }, brush);
 	}
 	target->SetTransform(Matrix3x2F::Identity());
 }
@@ -145,11 +147,13 @@ b2Body * Box2dScene::CreatePersonBody(int personId)
 	auto body = _world.CreateBody(&bodyDef);
 	body->SetUserData((void*)personId);
 
-	b2CircleShape shape;
-	shape.m_radius = CircleSize;
+	b2PolygonShape shape;
+	static uniform_real<float> Rrd;
+	auto H = PersonSize / 2;
+	shape.SetAsBox(H, H);
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &shape;
-	fixtureDef.density = 25;
+	fixtureDef.density = 5;
 	fixtureDef.friction = 0;
 	fixtureDef.restitution = 1;
 	body->CreateFixture(&fixtureDef);
