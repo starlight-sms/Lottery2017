@@ -20,10 +20,17 @@ private:
 	const float PersonSize = 0.40f;
 	const int _count;
 	const int _itemId;
-	bool _show = false;
+
+	enum class State
+	{
+		Pending,
+		Started,
+		Triggled,
+		Completed,
+	};
 
 	std::mt19937 _rd{ std::random_device{}() };
-
+	State _state;
 	const std::vector<int> _allPersonIds;
 
 	// mist
@@ -35,14 +42,16 @@ private:
 	b2World _world;
 	int _updateCount = 0;
 
-	b2Body* CreateBorderBody(float x, float y, float angle);
+	b2Body* CreateBorderBody(float x, float y, float angle, float length);
 	b2Body* CreatePersonBody(int personId);
+	void EnterTriggerMode();
 
 	// dxres
+	RectangleGeometry* GetOrCreateBorderGeometry(CHwndRenderTarget* target, float length);
 	float _scale;
 	CD2DSolidColorBrush *_borderBrush;
 	std::unordered_map<int, CD2DBitmapBrush *> _personBrushes;
-	RectangleGeometry* _borderGeometry;
+	std::unordered_map<float, RectangleGeometry*> _borderGeometries;
 };
 
 class RectangleGeometry final : public CD2DGeometry

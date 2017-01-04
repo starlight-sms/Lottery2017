@@ -192,14 +192,15 @@ LRESULT MainWindow::CreateDeviceResources(WPARAM, LPARAM lparam)
 
 void MainWindow::CreateScene(int count, int itemId, const std::vector<int>& personIds)
 {
+	if (itemId == 0)
 	{
-		_scenes.emplace_back(make_unique<FlashImageScene>(count, itemId, personIds));
+		_scenes.emplace_back(make_unique<Box2dScene>(count, itemId, personIds));
 		(*_scenes.rbegin())->CreateDeviceResources(GetRenderTarget());
 		(*_scenes.rbegin())->CreateDeviceSizeResources(GetRenderTarget());
 	}
-
+	else
 	{
-		_scenes.emplace_back(make_unique<Box2dScene>(count, itemId, personIds));
+		_scenes.emplace_back(make_unique<FlashImageScene>(count, itemId, personIds));
 		(*_scenes.rbegin())->CreateDeviceResources(GetRenderTarget());
 		(*_scenes.rbegin())->CreateDeviceSizeResources(GetRenderTarget());
 	}

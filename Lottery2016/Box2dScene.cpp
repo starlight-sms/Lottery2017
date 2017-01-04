@@ -16,16 +16,17 @@ Box2dScene::Box2dScene(int count, int itemId, const std::vector<int>& personIds)
 	_count(count),
 	_itemId(count),
 	_allPersonIds(personIds),
-	_world{ b2Vec2{0, 10} }
+	_world{ b2Vec2{0, 10} },
+	_state{ State::Pending }
 {
 	{
 		auto H = RelativeSize / 2;
 		auto A = RelativeSize;
 		auto P2 = XM_PIDIV2;
-		_borders.push_back(CreateBorderBody(H, 0, 0));
-		_borders.push_back(CreateBorderBody(0, H, P2));
-		_borders.push_back(CreateBorderBody(A, H, P2));
-		_borders.push_back(CreateBorderBody(H, A, 0));
+		_borders.push_back(CreateBorderBody(H, 0, 0, A));
+		_borders.push_back(CreateBorderBody(0, H, P2, A));
+		_borders.push_back(CreateBorderBody(A, H, P2, A));
+		_borders.push_back(CreateBorderBody(H, A, 0, A));
 	}
 
 	for (auto id : personIds)
@@ -48,13 +49,6 @@ void Box2dScene::CreateDeviceSizeResources(CHwndRenderTarget * target)
 {
 	auto size = target->GetSize();
 	_scale = 0.1f * min(size.width, size.height);
-	_borderGeometry = new RectangleGeometry(target,
-	{
-		-RelativeSize / 2.0f,
-		-BorderWidth / 2.0f,
-		RelativeSize / 2.0f,
-		BorderWidth / 2.0f
-	});
 
 	for (auto i : _allPersonIds)
 	{
@@ -72,24 +66,32 @@ void Box2dScene::CreateDeviceSizeResources(CHwndRenderTarget * target)
 
 void Box2dScene::Update()
 {
-	_world.Step(1 / 30.0f, 6, 2);
-	if (++_updateCount == 150)
+	if (_state == State::Started)
 	{
-		_world.SetGravity({ 0, 0 });
+		_world.Step(1 / 30.0f, 6, 2);
+		if (++_updateCount == 150)
+		{
+			_world.SetGravity({ 0, 0 });
+		}
+	}
+	else if (_state == State::Triggled)
+	{
+		_world.Step(1 / 300.0f, 6, 2);
 	}
 }
 
 void Box2dScene::Render(CHwndRenderTarget * target)
 {
-	if (!_show) return;
+	if (_state == State::Pending) return;
 
 	auto size = target->GetSize();
 
 	for (auto border : _borders)
 	{
 		PreRenderBody(target, border);
+		auto length = (INT_PTR)border->GetUserData() / 100.0f;
 		auto shape = (b2PolygonShape*)border->GetFixtureList()->GetShape();
-		target->FillGeometry(_borderGeometry, _borderBrush);
+		target->FillGeometry(GetOrCreateBorderGeometry(target, length), _borderBrush);
 	}
 	for (auto person : _personBodies)
 	{
@@ -105,9 +107,16 @@ void Box2dScene::Render(CHwndRenderTarget * target)
 
 void Box2dScene::KeyUp(UINT key)
 {
-	if (key == 'S')
+	if (key == VK_SPACE)
 	{
-		_show = !_show;
+		if (_state == State::Pending)
+		{
+			_state = State::Started;
+		}
+		else if (_state == State::Started)
+		{
+			EnterTriggerMode();
+		}
 	}
 }
 
@@ -122,7 +131,7 @@ void Box2dScene::PreRenderBody(CHwndRenderTarget* target, b2Body * body)
 		Matrix3x2F::Scale(_scale, _scale));
 }
 
-b2Body * Box2dScene::CreateBorderBody(float x, float y, float angle)
+b2Body * Box2dScene::CreateBorderBody(float x, float y, float angle, float length)
 {
 	b2BodyDef groundBodyDef;
 	groundBodyDef.type = b2_kinematicBody;
@@ -130,9 +139,10 @@ b2Body * Box2dScene::CreateBorderBody(float x, float y, float angle)
 	groundBodyDef.angle = angle;
 
 	b2PolygonShape groundBox;
-	groundBox.SetAsBox(RelativeSize, BorderWidth);
+	groundBox.SetAsBox(length / 2.0f, BorderWidth / 2.0f);
 
 	auto body = _world.CreateBody(&groundBodyDef);
+	body->SetUserData((void*)INT_PTR(length * 100));
 	body->CreateFixture(&groundBox, 0);
 	return body;
 }
@@ -159,6 +169,40 @@ b2Body * Box2dScene::CreatePersonBody(int personId)
 	body->CreateFixture(&fixtureDef);
 
 	return body;
+}
+
+void Box2dScene::EnterTriggerMode()
+{
+	_state = State::Triggled;
+	auto A = RelativeSize;
+	auto H = A / 2;
+	auto P2 = XM_PIDIV2;
+	auto A61 = A / 6;
+	auto A65 = A61 * 5;
+	auto A3 = A / 3;
+	auto rightBorder = _borders.begin() + 2;
+	_world.DestroyBody(*rightBorder);
+	_borders.erase(rightBorder);
+
+	_borders.push_back(CreateBorderBody(A, A61, P2, A3));
+	_borders.push_back(CreateBorderBody(A, A65, P2, A3));
+	_borders.push_back(CreateBorderBody(A + H, H, P2, A));
+}
+
+RectangleGeometry * Box2dScene::GetOrCreateBorderGeometry(CHwndRenderTarget* target, float length)
+{
+	if (_borderGeometries.find(length) == _borderGeometries.end())
+	{
+		_borderGeometries[length] = new RectangleGeometry(target,
+		{
+			-length / 2.0f,
+			-BorderWidth / 2.0f,
+			length / 2.0f,
+			BorderWidth / 2.0f
+		});
+		HR(_borderGeometries[length]->Create(target));
+	}
+	return _borderGeometries[length];
 }
 
 CD2DPointF ToD2DPoint(const b2Vec2 & v)
