@@ -7,18 +7,10 @@
 using namespace std;
 using D2D1::ColorF;
 
-CD2DSizeF Divide(CD2DSizeF v, float x, float y);
-CD2DSizeF Multiple(CD2DSizeF v, float x, float y);
-CD2DSizeF GetDisplaySize(const CD2DSizeF& inputSize, const CD2DSizeF& clampSize);
-CD2DRectF GetDrawCenterRect(const CD2DSizeF& topLeft, const CD2DSizeF& gridSize, const CD2DSizeF& realSize);
-
 FlashImageScene::FlashImageScene(int count, int itemId, std::vector<int> persons) :
-	_count(count),
-	_itemId(itemId), 
-	_allPersonIds(move(persons)),
-	_mt19937(random_device()())
+	LotteryScene(count, itemId, persons)
 {
-	if (_allPersonIds.size() < _count)
+	if (_allPersonIds.size() < (size_t)_requiredCount)
 	{
 		throw make_exception_ptr("allPersionIds size must >= count.");
 	}
@@ -28,8 +20,12 @@ void FlashImageScene::Update()
 {
 	if (_started)
 	{
-		shuffle(begin(_allPersonIds), end(_allPersonIds), _mt19937);
-		_selectedPersonIds.assign(begin(_allPersonIds), begin(_allPersonIds) + _count);
+		shuffle(begin(_allPersonIds), end(_allPersonIds), _rd);
+		_luckyPersonIds.clear();
+		for (int i = 0; i < _requiredCount; ++i)
+		{
+			_luckyPersonIds.insert(_allPersonIds[i]);
+		}
 	}	
 }
 
@@ -37,16 +33,16 @@ void FlashImageScene::Render(CHwndRenderTarget * target)
 {
 	auto windowSize = target->GetSize();
 	auto whRate = windowSize.width / windowSize.height;
-	auto maxCol = (int)ceil(sqrt(_count * whRate));
-	auto maxRow = (int)ceil(1.0 * _count / maxCol);
+	auto maxCol = (int)ceil(sqrt(_requiredCount * whRate));
+	auto maxRow = (int)ceil(1.0 * _requiredCount / maxCol);
 		
 	auto gridSize = Divide(windowSize, (float)maxCol, (float)maxRow);
-	auto lastCol = _count - (maxRow - 1) * maxCol;
+	auto lastCol = _requiredCount - (maxRow - 1) * maxCol;
 	auto lastGridSize = Divide(windowSize, (float)lastCol, (float)maxRow);
 
-	for (size_t i = 0, col = 0, row = 0; i < _selectedPersonIds.size(); ++i)
+	int col = 0, row = 0;
+	for (auto id : _luckyPersonIds)
 	{
-		auto id = _selectedPersonIds[i];
 		auto grid = (int)row < maxRow - 1 ? gridSize : lastGridSize;
 		auto topLeft = Multiple(grid, (float)col, (float)row);
 		auto bmp = _personBitmaps[id];
@@ -60,7 +56,7 @@ void FlashImageScene::Render(CHwndRenderTarget * target)
 			str.Append(L"\r\n");
 			str.Append(GetAllPerson()[id].Notes);
 		}
-		target->DrawTextW(str, rect, _blue, _textFormat);
+		target->DrawTextW(str, rect, _blue, _headerTextFormat);
 
 		row += ++col / maxCol;
 		col = col % maxCol;
@@ -74,10 +70,9 @@ void FlashImageScene::KeyUp(UINT key)
 		if (_started)
 		{
 			_started = false;
-			// save...
-			SaveLuckyPersonIds(_itemId, _selectedPersonIds);
+			Save();
 		}
-		else if (_selectedPersonIds.size() == 0)
+		else if (_luckyPersonIds.size() == 0)
 		{
 			_started = true;
 		}
@@ -97,56 +92,4 @@ void FlashImageScene::CreateDeviceResources(CHwndRenderTarget * target)
 		HR(_personBitmaps[id]->Create(target));
 	}
 	_blue = new CD2DSolidColorBrush(target, ColorF(ColorF::Blue));
-}
-
-void FlashImageScene::CreateDeviceSizeResources(CHwndRenderTarget * target)
-{
-	if (_textFormat)
-		_textFormat->Destroy();
-
-	auto size = target->GetSize();
-	auto minEdge = std::min(size.width, size.height);
-	auto real = b2Clamp(minEdge / 40, 12.0f, 24.0f);
-	_textFormat = new CD2DTextFormat(target, L"Consolas", real);
-}
-
-CD2DSizeF Divide(CD2DSizeF v, float x, float y)
-{
-	v.width /= x;
-	v.height /= y;
-	return v;
-}
-
-CD2DSizeF Multiple(CD2DSizeF v, float x, float y)
-{
-	v.width *= x;
-	v.height *= y;
-	return v;
-}
-
-CD2DSizeF GetDisplaySize(const CD2DSizeF & inputSize, const CD2DSizeF & scaleSize)
-{
-	auto inputRate = inputSize.width / inputSize.height;
-	auto clampRate = scaleSize.width / scaleSize.height;
-
-	float scale;
-	if (inputRate > clampRate)
-	{
-		scale = inputSize.width / scaleSize.width;
-	}
-	else
-	{
-		scale = inputSize.height / scaleSize.height;
-	}
-	return Divide(inputSize, scale, scale);
-}
-
-CD2DRectF GetDrawCenterRect(const CD2DSizeF & topLeft, const CD2DSizeF & gridSize, const CD2DSizeF & realSize)
-{
-	return CD2DRectF(
-		topLeft.width  + (gridSize.width  - realSize.width)  / 2, 
-		topLeft.height + (gridSize.height - realSize.height) / 2, 
-		topLeft.width  + (gridSize.width  - realSize.width)  / 2 + realSize.width,
-		topLeft.height + (gridSize.height - realSize.height) / 2 + realSize.height
-	);
 }

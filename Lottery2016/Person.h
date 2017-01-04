@@ -21,7 +21,7 @@ std::vector<Person> GetUnluckyPerson();
 
 std::vector<int> GetUnluckyPersonIds();
 
-const void SaveLuckyPersonIds(int itemId, const std::vector<int>& personIds);
+const void SaveLuckyPersonIds(int itemId, const std::unordered_set<int>& personIds);
 
 std::vector<int> GetLuckyPersonIds(int itemId);
 

@@ -2,9 +2,8 @@
 #include "FlashImageScene.h"
 
 struct Person;
-class RectangleGeometry;
 
-class Box2dScene final : public Scene
+class Box2dScene final : public LotteryScene
 {
 public:
 	Box2dScene(int count, int itemId, const std::vector<int>& personIds);
@@ -18,8 +17,6 @@ private:
 	const float RelativeSize = 10.0f;
 	const float BorderWidth = RelativeSize / 100;
 	const float PersonSize = 0.40f;
-	const int _requiredCount;
-	const int _itemId;
 
 	enum class State
 	{
@@ -29,10 +26,7 @@ private:
 		Completed,
 	};
 
-	std::mt19937 _rd{ std::random_device{}() };
 	State _state;
-	const std::vector<int> _allPersonIds;
-	std::unordered_set<int> _luckyPersonIds;
 
 	// mist
 	void PreRenderBody(CHwndRenderTarget* target, b2Body * body);
@@ -54,14 +48,4 @@ private:
 	CD2DSolidColorBrush *_borderBrush, *_luckyBrush;
 	std::unordered_map<int, CD2DBitmapBrush *> _personBrushes;
 	std::unordered_map<float, RectangleGeometry*> _borderGeometries;
-};
-
-class RectangleGeometry final : public CD2DGeometry
-{
-public:
-	RectangleGeometry(CRenderTarget* target, const D2D1_RECT_F rect, bool isAutoDestroy = true);
-	virtual HRESULT Create(CRenderTarget * pRenderTarget) override;
-
-private:
-	D2D1_RECT_F _rect;
 };

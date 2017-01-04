@@ -13,9 +13,7 @@ using namespace DirectX;
 CD2DPointF ToD2DPoint(const b2Vec2& v);
 
 Box2dScene::Box2dScene(int count, int itemId, const std::vector<int>& personIds) :
-	_requiredCount(count),
-	_itemId(count),
-	_allPersonIds(personIds),
+	LotteryScene(count, itemId, personIds), 
 	_world{ b2Vec2{0, 10} },
 	_state{ State::Pending }
 {
@@ -48,6 +46,7 @@ void Box2dScene::CreateDeviceResources(CHwndRenderTarget * target)
 
 void Box2dScene::CreateDeviceSizeResources(CHwndRenderTarget * target)
 {
+	__super::CreateDeviceSizeResources(target);
 	auto size = target->GetSize();
 	_scale = 0.1f * min(size.width, size.height);
 

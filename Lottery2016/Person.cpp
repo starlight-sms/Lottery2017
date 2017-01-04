@@ -74,7 +74,7 @@ CString CreateLuckyStatusFile(int itemId, std::vector<int>& personIds)
 	return L"temp.txt";
 }
 
-const void SaveLuckyPersonIds(int itemId, const vector<int>& personWorkIds)
+const void SaveLuckyPersonIds(int itemId, const unordered_set<int>& personWorkIds)
 {
 	vector<int> existing = GetLuckyPersonIds(itemId);
 
