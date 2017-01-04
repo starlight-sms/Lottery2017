@@ -220,6 +220,7 @@ size_t MainWindow::GetLotteryId()
 
 void MainWindow::CreateDeviceResources(CHwndRenderTarget * target)
 {
+	LotteryBitmaps.clear();
 	for (size_t i = 0; i < GetItems().size(); ++i)
 	{
 		LotteryBitmaps.push_back(new CD2DBitmap(target, GetItems()[i].ResourceId, L"Item"));
@@ -227,6 +228,12 @@ void MainWindow::CreateDeviceResources(CHwndRenderTarget * target)
 	}
 
 	_brush = new CD2DSolidColorBrush(target, ColorF(ColorF::Green));
+
+	for (auto & scene : _scenes)
+	{
+		scene->CreateDeviceResources(target);
+		scene->CreateDeviceSizeResources(target);
+	}
 }
 
 void MainWindow::CreateDeviceSizeResources(CHwndRenderTarget * target)
