@@ -40,12 +40,13 @@ private:
 	b2Body* CreateBorderBody(float x, float y, float angle, float length);
 	b2Body* CreatePersonBody(int personId);
 	void FindLuckyPersons();
+	void CompleteAndSave();
 	void EnterTriggerMode();
 
 	// dxres
 	RectangleGeometry* GetOrCreateBorderGeometry(CHwndRenderTarget* target, float length);
 	float _scale;
-	CD2DSolidColorBrush *_borderBrush, *_luckyBrush;
+	D2D1::ColorF::Enum _borderColor = D2D1::ColorF::LightGray, _luckyColor = D2D1::ColorF::Red;
 	std::unordered_map<int, CD2DBitmapBrush *> _personBrushes;
 	std::unordered_map<float, RectangleGeometry*> _borderGeometries;
 };

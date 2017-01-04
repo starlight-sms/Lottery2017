@@ -50,13 +50,15 @@ void FlashImageScene::Render(CHwndRenderTarget * target)
 		auto realSize = GetDisplaySize(bmp->GetSize(), grid);
 		auto rect = GetDrawCenterRect(topLeft, grid, realSize);
 		target->DrawBitmap(bmp, rect);
+
 		CString str = GetAllPerson()[id].Name;
+		target->DrawTextW(str, rect, GetColorBrush(target, ColorF::Red), _headerTextFormat);
 		if (!_started)
 		{
-			str.Append(L"\r\n");
-			str.Append(GetAllPerson()[id].Notes);
-		}
-		target->DrawTextW(str, rect, _blue, _headerTextFormat);
+			CString notes(L"\r\n");
+			notes.Append(GetAllPerson()[id].Notes);
+			target->DrawTextW(notes, rect, GetColorBrush(target, ColorF::OrangeRed), _textFormat);
+		}		
 
 		row += ++col / maxCol;
 		col = col % maxCol;
@@ -85,11 +87,11 @@ void FlashImageScene::KeyUp(UINT key)
 
 void FlashImageScene::CreateDeviceResources(CHwndRenderTarget * target)
 {
+	__super::CreateDeviceResources(target);
 	for (size_t i = 0; i < _allPersonIds.size(); ++i)
 	{
 		auto id = _allPersonIds[i];
 		_personBitmaps[id] = new CD2DBitmap(target, GetAllPerson()[i].ResourceId, L"Person");
 		HR(_personBitmaps[id]->Create(target));
 	}
-	_blue = new CD2DSolidColorBrush(target, ColorF(ColorF::Blue));
 }

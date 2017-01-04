@@ -35,8 +35,7 @@ Box2dScene::Box2dScene(int count, int itemId, const std::vector<int>& personIds)
 
 void Box2dScene::CreateDeviceResources(CHwndRenderTarget * target)
 {
-	_borderBrush = new CD2DSolidColorBrush(target, ColorF(ColorF::LightGray));
-	_luckyBrush = new CD2DSolidColorBrush(target, ColorF(ColorF::Red));
+	__super::CreateDeviceResources(target);
 	for (auto i : _allPersonIds)
 	{
 		_personBrushes[i] = new CD2DBitmapBrush(target, GetAllPerson()[i].ResourceId, L"Person");
@@ -59,7 +58,7 @@ void Box2dScene::CreateDeviceSizeResources(CHwndRenderTarget * target)
 				-float(bitmapSize.width - minEdge) / 2,
 				-float(bitmapSize.height - minEdge) / 2) *
 			Matrix3x2F::Translation(-minEdge / 2, -minEdge / 2) *
-			Matrix3x2F::Scale(PersonSize * 2 / minEdge, PersonSize * 2 / minEdge);
+			Matrix3x2F::Scale(PersonSize / minEdge, PersonSize / minEdge);
 		_personBrushes[i]->SetTransform(&transform);
 	}
 }
@@ -92,7 +91,7 @@ void Box2dScene::Render(CHwndRenderTarget * target)
 		PreRenderBody(target, border);
 		auto length = (INT_PTR)border->GetUserData() / 100.0f;
 		auto shape = (b2PolygonShape*)border->GetFixtureList()->GetShape();
-		target->FillGeometry(GetOrCreateBorderGeometry(target, length), _borderBrush);
+		target->FillGeometry(GetOrCreateBorderGeometry(target, length), GetColorBrush(target, _borderColor));
 	}
 	for (auto person : _personBodies)
 	{
@@ -105,7 +104,7 @@ void Box2dScene::Render(CHwndRenderTarget * target)
 
 		if (_luckyPersonIds.find(userId) != _luckyPersonIds.end())
 		{
-			target->DrawRectangle({ -H, -H, H, H }, _luckyBrush, 3 / _scale);
+			target->DrawRectangle({ -H, -H, H, H }, GetColorBrush(target, _luckyColor), 3 / _scale);
 		}
 	}
 	target->SetTransform(Matrix3x2F::Identity());
@@ -192,13 +191,19 @@ void Box2dScene::FindLuckyPersons()
 
 		if (_luckyPersonIds.size() == _requiredCount)
 		{
-			_state = State::Completed;
+			CompleteAndSave();
 			break;
 		}
 		item = item->next;
 	}
 
 	for (auto body : bodies) body->SetType(b2_staticBody);
+}
+
+void Box2dScene::CompleteAndSave()
+{
+	_state = State::Completed;
+	Save();
 }
 
 void Box2dScene::EnterTriggerMode()

@@ -17,5 +17,4 @@ private:
 
 	// dxres
 	std::unordered_map<int, CD2DBitmap*> _personBitmaps;
-	CD2DSolidColorBrush* _blue;
 };

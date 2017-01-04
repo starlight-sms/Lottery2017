@@ -81,3 +81,8 @@ CD2DSolidColorBrush * LotteryScene::GetColorBrush(CHwndRenderTarget * target, D2
 	return _brushCache[color];
 }
 
+void LotteryScene::CreateDeviceResources(CHwndRenderTarget * target)
+{
+	_brushCache.clear();
+}
+

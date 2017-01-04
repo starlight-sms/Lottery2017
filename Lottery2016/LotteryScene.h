@@ -17,6 +17,7 @@ public:
 
 	// Í¨¹ý Scene ¼Ì³Ð
 	virtual void CreateDeviceSizeResources(CHwndRenderTarget * target) override;
+	virtual void CreateDeviceResources(CHwndRenderTarget * target) override;
 protected:
 	CD2DSizeF Divide(CD2DSizeF v, float x, float y);
 	CD2DSizeF Multiple(CD2DSizeF v, float x, float y);
