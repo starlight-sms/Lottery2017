@@ -47,8 +47,12 @@ void RandomDemoScene::Render(CHwndRenderTarget * target)
 	auto stdavg = (_sumStd += stdev) / _iterateCount;
 	DrawStd(target, stdavg, 10.0f, 30.0f);
 
+	//rand		66.70	(154W)
+	//rd		65.33	(172W)
+	//mt19937	65.11	(152W)
+	//Random	65.21	(152W)
 
-	DrawStd(target, _iterateCount/100.0, 10.0f, 50.0f);
+	DrawStd(target, _iterateCount / 100.0, 10.0f, 50.0f);
 
 	for (int i = 0; i < SampleCount; ++i)
 	{
