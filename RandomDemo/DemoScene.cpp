@@ -12,9 +12,15 @@ public:
 	static System::Random ^r = gcnew System::Random(System::Guid::NewGuid().GetHashCode());
 };
 
+RandomDemoScene::RandomDemoScene() :
+	_ui{ 0, SampleCount - 1 }
+{
+}
+
 void RandomDemoScene::CreateDeviceResources(CHwndRenderTarget *target)
 {
-	_brush = new CD2DSolidColorBrush(target, ColorF(ColorF::Black));
+	_black = new CD2DSolidColorBrush(target, ColorF(ColorF::Black));
+	_white = new CD2DSolidColorBrush(target, ColorF(ColorF::White));
 }
 
 void RandomDemoScene::CreateDeviceSizeResources(CHwndRenderTarget *)
@@ -24,27 +30,46 @@ void RandomDemoScene::CreateDeviceSizeResources(CHwndRenderTarget *)
 void RandomDemoScene::Render(CHwndRenderTarget * target)
 {
 	auto size = target->GetSize();
-	const UINT MaxS = 0x10000;
-	auto scaleX = size.width / MaxS;
-	auto scaleY = size.height / MaxS;
+	auto unitH = size.height * 0.8f / (SampleTotal / SampleCount);
+	auto baseH = size.height * 0.1f;
+	auto baseW = size.width / SampleCount;
 
-	target->SetTransform(Matrix3x2F::Scale(scaleX, scaleY));
-	for (auto p : _points)
+	double sum = std::accumulate(begin(_result), end(_result), 0.0);
+	double mean = sum / _result.size();
+	double sq_sum = inner_product(begin(_result), end(_result), begin(_result), 0.0);
+
+	double stdev = sqrt(sq_sum / _result.size() - mean * mean);
+	DrawStd(target, stdev, 10.0f, 0.0f);
+	_minStd = min(stdev, _minStd);
+	DrawStd(target, _minStd, 10.0f, 10.0f);
+	_maxStd = max(stdev, _maxStd);
+	DrawStd(target, _maxStd, 10.0f, 20.0f);
+	auto stdavg = (_sumStd += stdev) / _iterateCount;
+	DrawStd(target, stdavg, 10.0f, 30.0f);
+
+
+	DrawStd(target, _iterateCount/100.0, 10.0f, 50.0f);
+
+	for (int i = 0; i < SampleCount; ++i)
 	{
-		auto x = UINT(p % MaxS);
-		auto y = UINT(p / MaxS);
-		CD2DRectF rect{ (float)x, (float)y, (float)x + 2 / scaleX, (float)y + 2 / scaleY };
-		target->FillRectangle(rect, _brush);
+		auto count = _result[i];
+		CD2DRectF rect{
+			i * baseW + 1, baseH,
+			(i + 1)* baseW - 1, baseH + count * unitH
+		};
+		target->FillRectangle(rect, _black);
 	}
 }
-;
+
 void RandomDemoScene::Update()
 {
-	_points.clear();
-	for (auto i = 0; i < 50000; ++i)
+	_result.clear();
+	_result.assign(SampleCount, 0);
+	for (auto i = 0; i < SampleTotal; ++i)
 	{
-		_points.push_back(GetNextRand());
+		_result[GetNextRand()]++;
 	}
+	_iterateCount++;
 }
 
 std::unique_ptr<RandomDemoScene> RandomDemoScene::Make(int type)
@@ -63,36 +88,50 @@ std::unique_ptr<RandomDemoScene> RandomDemoScene::Make(int type)
 		return make_unique<RanluxDemoScene>();
 	case ID_TEST_CSRANDOM:
 		return make_unique<CSDemoScene>();
+	case ID_TEST_MT19937_64:
+		return make_unique<Mt1993764DemoScene>();
 	}
 	throw make_exception_ptr("unknown type");
 }
 
-UINT RandDemoScene::GetNextRand()
+void RandomDemoScene::DrawStd(CHwndRenderTarget* target, double std, float height, float y)
 {
-	return (rand() << 17) + (rand() * 2);
+	auto size = target->GetSize();
+	CD2DRectF stdevRect{ 0.f, y, float(std / 150 * size.width), y + height };
+	target->FillRectangle(stdevRect, _black);
 }
 
-UINT RdDemoScene::GetNextRand()
+int RandDemoScene::GetNextRand()
 {
-	return _rd();
+	return rand() % SampleCount;
 }
 
-UINT Mt19937DemoScene::GetNextRand()
+int RdDemoScene::GetNextRand()
 {
-	return _mt();
+	return _ui(_rd);
 }
 
-UINT RanluxDemoScene::GetNextRand()
+int Mt19937DemoScene::GetNextRand()
 {
-	return (UINT)_rd();
+	return _ui(_mt);
 }
 
-UINT MinstdRandDemoScene::GetNextRand()
+int RanluxDemoScene::GetNextRand()
 {
-	return _rd() * 2;
+	return _ui(_rd);
 }
 
-UINT CSDemoScene::GetNextRand()
+int MinstdRandDemoScene::GetNextRand()
 {
-	return (UINT)Test::r->Next() * 2;
+	return _ui(_rd);
+}
+
+int CSDemoScene::GetNextRand()
+{
+	return Test::r->Next() % SampleCount;
+}
+
+int Mt1993764DemoScene::GetNextRand()
+{
+	return _ui(_mt);
 }
