@@ -13,7 +13,7 @@ using namespace DirectX;
 CD2DPointF ToD2DPoint(const b2Vec2& v);
 
 Box2dScene::Box2dScene(int count, int itemId, const std::vector<int>& personIds) :
-	_count(count),
+	_requiredCount(count),
 	_itemId(count),
 	_allPersonIds(personIds),
 	_world{ b2Vec2{0, 10} },
@@ -38,6 +38,7 @@ Box2dScene::Box2dScene(int count, int itemId, const std::vector<int>& personIds)
 void Box2dScene::CreateDeviceResources(CHwndRenderTarget * target)
 {
 	_borderBrush = new CD2DSolidColorBrush(target, ColorF(ColorF::LightGray));
+	_luckyBrush = new CD2DSolidColorBrush(target, ColorF(ColorF::Red));
 	for (auto i : _allPersonIds)
 	{
 		_personBrushes[i] = new CD2DBitmapBrush(target, GetAllPerson()[i].ResourceId, L"Person");
@@ -77,6 +78,7 @@ void Box2dScene::Update()
 	else if (_state == State::Triggled)
 	{
 		_world.Step(1 / 300.0f, 6, 2);
+		FindLuckyPersons();
 	}
 }
 
@@ -101,6 +103,11 @@ void Box2dScene::Render(CHwndRenderTarget * target)
 		auto brush = _personBrushes[userId];
 		auto H = PersonSize / 2;
 		target->FillRectangle({ -H, -H, H, H }, brush);
+
+		if (_luckyPersonIds.find(userId) != _luckyPersonIds.end())
+		{
+			target->DrawRectangle({ -H, -H, H, H }, _luckyBrush, 3 / _scale);
+		}
 	}
 	target->SetTransform(Matrix3x2F::Identity());
 }
@@ -155,7 +162,7 @@ b2Body * Box2dScene::CreatePersonBody(int personId)
 	bodyDef.position.Set(ur(_rd), ur(_rd));
 
 	auto body = _world.CreateBody(&bodyDef);
-	body->SetUserData((void*)personId);
+	body->SetUserData((void*)(INT_PTR)personId);
 
 	b2PolygonShape shape;
 	static uniform_real<float> Rrd;
@@ -169,6 +176,30 @@ b2Body * Box2dScene::CreatePersonBody(int personId)
 	body->CreateFixture(&fixtureDef);
 
 	return body;
+}
+
+void Box2dScene::FindLuckyPersons()
+{
+	auto luckyBoard = *_borders.rbegin();
+	auto item = luckyBoard->GetContactList();
+
+	std::vector<b2Body*> bodies;
+	while (item != nullptr)
+	{
+		auto personBody = item->other;
+		auto userId = (int)(INT_PTR)personBody->GetUserData();
+		_luckyPersonIds.insert(userId);
+		bodies.push_back(personBody);
+
+		if (_luckyPersonIds.size() == _requiredCount)
+		{
+			_state = State::Completed;
+			break;
+		}
+		item = item->next;
+	}
+
+	for (auto body : bodies) body->SetType(b2_staticBody);
 }
 
 void Box2dScene::EnterTriggerMode()
