@@ -7,16 +7,13 @@ class Box2dScene final : public LotteryScene
 {
 public:
 	Box2dScene(int count, int itemId, const std::vector<int>& personIds);
-	virtual void CreateDeviceResources(CHwndRenderTarget * target) override;
-	virtual void CreateDeviceSizeResources(CHwndRenderTarget * target) override;
 	virtual void Update() override;
-	virtual void Render(CHwndRenderTarget * target) override;
+	virtual void Render(CHwndRenderTarget * target, DxRes* dxRes) override;
 	virtual void KeyUp(UINT key) override;
 
 private:
 	const float RelativeSize = 10.0f;
 	const float BorderWidth = RelativeSize / 100;
-	const float PersonSize = 0.40f;
 
 	enum class State
 	{
@@ -29,7 +26,7 @@ private:
 	State _state;
 
 	// mist
-	void PreRenderBody(CHwndRenderTarget* target, b2Body * body);
+	void PreRenderBody(CHwndRenderTarget* target, b2Body * body, float scale);
 
 	// b2 related
 	std::vector<b2Body*> _borders;
@@ -44,9 +41,5 @@ private:
 	void EnterTriggerMode();
 
 	// dxres
-	RectangleGeometry* GetOrCreateBorderGeometry(CHwndRenderTarget* target, float length);
-	float _scale;
 	D2D1::ColorF::Enum _borderColor = D2D1::ColorF::LightGray, _luckyColor = D2D1::ColorF::Red;
-	std::unordered_map<int, CD2DBitmapBrush *> _personBrushes;
-	std::unordered_map<float, RectangleGeometry*> _borderGeometries;
 };

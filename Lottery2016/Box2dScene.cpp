@@ -33,36 +33,6 @@ Box2dScene::Box2dScene(int count, int itemId, const std::vector<int>& personIds)
 	}
 }
 
-void Box2dScene::CreateDeviceResources(CHwndRenderTarget * target)
-{
-	__super::CreateDeviceResources(target);
-	for (auto i : _allPersonIds)
-	{
-		_personBrushes[i] = new CD2DBitmapBrush(target, GetAllPerson()[i].ResourceId, L"Person");
-		HR(_personBrushes[i]->Create(target));
-	}
-}
-
-void Box2dScene::CreateDeviceSizeResources(CHwndRenderTarget * target)
-{
-	__super::CreateDeviceSizeResources(target);
-	auto size = target->GetSize();
-	_scale = 0.1f * min(size.width, size.height);
-
-	for (auto i : _allPersonIds)
-	{
-		auto bitmapSize = _personBrushes[i]->GetBitmap()->GetPixelSize();
-		auto minEdge = (float)std::min(bitmapSize.width, bitmapSize.height);
-		auto transform =
-			Matrix3x2F::Translation(
-				-float(bitmapSize.width - minEdge) / 2,
-				-float(bitmapSize.height - minEdge) / 2) *
-			Matrix3x2F::Translation(-minEdge / 2, -minEdge / 2) *
-			Matrix3x2F::Scale(PersonSize / minEdge, PersonSize / minEdge);
-		_personBrushes[i]->SetTransform(&transform);
-	}
-}
-
 void Box2dScene::Update()
 {
 	if (_state == State::Started)
@@ -80,51 +50,54 @@ void Box2dScene::Update()
 	}
 }
 
-void Box2dScene::Render(CHwndRenderTarget * target)
+void Box2dScene::Render(CHwndRenderTarget * target, DxRes* dxRes)
 {
 	if (_state == State::Pending) return;
 
 	auto size = target->GetSize();
+	auto scale = 0.1f * min(size.width, size.height);
 
 	for (auto border : _borders)
 	{
-		PreRenderBody(target, border);
+		PreRenderBody(target, border, scale);
 		auto length = (INT_PTR)border->GetUserData() / 100.0f;
 		auto shape = (b2PolygonShape*)border->GetFixtureList()->GetShape();
-		target->FillGeometry(GetOrCreateBorderGeometry(target, length), GetColorBrush(target, _borderColor));
+		target->FillGeometry(
+			dxRes->GetOrCreateBorderGeometry(target, length, BorderWidth), 
+			dxRes->GetColorBrush(target, _borderColor));
 	}
 
 	auto H = PersonSize / 2;
 	for (auto personBody : _personBodies)
 	{
-		PreRenderBody(target, personBody);
+		PreRenderBody(target, personBody, scale);
 		auto shape = (b2PolygonShape*)personBody->GetFixtureList()->GetShape();
 		auto userId = (int)personBody->GetUserData();
-		auto brush = _personBrushes[userId];
+		auto brush = dxRes->PersonBrushes[userId];
 		target->FillRectangle({ -H, -H, H, H }, brush);
 
-		auto color = GetColorBrush(target, _luckyColor);
+		auto color = dxRes->GetColorBrush(target, _luckyColor);
 		if (_luckyPersonIds.find(userId) != _luckyPersonIds.end())
 		{
-			target->DrawRectangle({ -H, -H, H, H }, color, 3 / _scale);
+			target->DrawRectangle({ -H, -H, H, H }, color, 3 / scale);
 
 			target->SetTransform(Matrix3x2F::Identity());
 
 			auto person = GetAllPerson()[userId];
-			auto X = personBody->GetPosition().x * _scale;
-			auto Y = personBody->GetPosition().y * _scale;
+			auto X = personBody->GetPosition().x * scale;
+			auto Y = personBody->GetPosition().y * scale;
 
 			CD2DRectF nameRect{
-				X - _scale * 1.5f,
+				X - scale * 1.5f,
 				Y - 20,
 				X, Y + 300 };
-			target->DrawTextW(person.Name, nameRect, color, _headerTextFormat);
+			target->DrawTextW(person.Name, nameRect, color, dxRes->HeaderTextFormat);
 
 			CD2DRectF notesRect{
-				X - _scale * 4,
+				X - scale * 4,
 				Y,
 				X,Y + 300 };
-			target->DrawTextW(person.Notes, notesRect, color, _textFormat);
+			target->DrawTextW(person.Notes, notesRect, color, dxRes->TextFormat);
 		}
 	}
 
@@ -146,7 +119,7 @@ void Box2dScene::KeyUp(UINT key)
 	}
 }
 
-void Box2dScene::PreRenderBody(CHwndRenderTarget* target, b2Body * body)
+void Box2dScene::PreRenderBody(CHwndRenderTarget* target, b2Body * body, float scale)
 {
 	auto pos = body->GetPosition();
 	auto angle = body->GetAngle();
@@ -154,7 +127,7 @@ void Box2dScene::PreRenderBody(CHwndRenderTarget* target, b2Body * body)
 	target->SetTransform(
 		Matrix3x2F::Rotation(XMConvertToDegrees(angle)) *
 		Matrix3x2F::Translation(pos.x, pos.y) *
-		Matrix3x2F::Scale(_scale, _scale));
+		Matrix3x2F::Scale(scale, scale));
 }
 
 b2Body * Box2dScene::CreateBorderBody(float x, float y, float angle, float length)
@@ -243,22 +216,6 @@ void Box2dScene::EnterTriggerMode()
 	_borders.push_back(CreateBorderBody(A, A61, P2, A3));
 	_borders.push_back(CreateBorderBody(A, A65, P2, A3));
 	_borders.push_back(CreateBorderBody(A + H, H, P2, A*0.9f));
-}
-
-RectangleGeometry * Box2dScene::GetOrCreateBorderGeometry(CHwndRenderTarget* target, float length)
-{
-	if (_borderGeometries.find(length) == _borderGeometries.end())
-	{
-		_borderGeometries[length] = new RectangleGeometry(target,
-		{
-			-length / 2.0f,
-			-BorderWidth / 2.0f,
-			length / 2.0f,
-			BorderWidth / 2.0f
-		});
-		HR(_borderGeometries[length]->Create(target));
-	}
-	return _borderGeometries[length];
 }
 
 CD2DPointF ToD2DPoint(const b2Vec2 & v)

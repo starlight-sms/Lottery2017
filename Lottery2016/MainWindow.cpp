@@ -53,7 +53,7 @@ void MainWindow::OnSize(UINT nType, int cx, int cy)
 {
 	if (nType != SIZE_MINIMIZED && GetRenderTarget())
 	{
-		CreateDeviceSizeResources(GetRenderTarget());
+		_dxRes.CreateDeviceSizeResources(GetRenderTarget());
 	}
 }
 
@@ -140,8 +140,8 @@ int MainWindow::OnCreate(LPCREATESTRUCT cs)
 
 	// d2d
 	EnableD2DSupport();
-	CreateDeviceResources(GetRenderTarget());
-	CreateDeviceSizeResources(GetRenderTarget());
+	_dxRes.CreateDeviceResources(GetRenderTarget());
+	_dxRes.CreateDeviceSizeResources(GetRenderTarget());
 
 	CreateScene(GetItems()[0].Count, 0, GetUnluckyPersonIds());
 
@@ -168,25 +168,26 @@ LRESULT MainWindow::OnDraw2D(WPARAM, LPARAM lparam)
 	GetClientRect(&rect);
 	CD2DRectF d2dRect{ (float)rect.left, (float)rect.top, (float)rect.right, (float)rect.bottom };
 
-	target->DrawBitmap(LotteryBitmaps[GetLotteryId()], d2dRect);
+	target->DrawBitmap(_dxRes.LotteryBitmaps[GetLotteryId()], d2dRect);
 
 	for (auto& scene : _scenes)
 	{
-		scene->Render(target);
+		scene->Render(target, &_dxRes);
 	}
 
 	SYSTEMTIME st;
 	GetLocalTime(&st);
 	CString str;
 	str.Format(L"%d", st.wMilliseconds);
-	target->DrawTextW(str, d2dRect, _brush);
+	target->DrawTextW(str, d2dRect, _dxRes.GetColorBrush(target, ColorF::Blue));
 
 	return TRUE;
 }
 
 LRESULT MainWindow::CreateDeviceResources(WPARAM, LPARAM lparam)
 {
-	CreateDeviceResources((CHwndRenderTarget*)lparam);
+	_dxRes.ClearDeviceResources();
+	_dxRes.CreateDeviceResources((CHwndRenderTarget*)lparam);
 	return 0;
 }
 
@@ -195,14 +196,10 @@ void MainWindow::CreateScene(int count, int itemId, const std::vector<int>& pers
 	if (itemId != 3)
 	{
 		_scenes.emplace_back(make_unique<Box2dScene>(count, itemId, personIds));
-		(*_scenes.rbegin())->CreateDeviceResources(GetRenderTarget());
-		(*_scenes.rbegin())->CreateDeviceSizeResources(GetRenderTarget());
 	}
 	else
 	{
 		_scenes.emplace_back(make_unique<FlashImageScene>(count, itemId, personIds));
-		(*_scenes.rbegin())->CreateDeviceResources(GetRenderTarget());
-		(*_scenes.rbegin())->CreateDeviceSizeResources(GetRenderTarget());
 	}
 }
 
@@ -216,30 +213,4 @@ size_t MainWindow::GetLotteryId()
 		}
 	}
 	return 0;
-}
-
-void MainWindow::CreateDeviceResources(CHwndRenderTarget * target)
-{
-	LotteryBitmaps.clear();
-	for (size_t i = 0; i < GetItems().size(); ++i)
-	{
-		LotteryBitmaps.push_back(new CD2DBitmap(target, GetItems()[i].ResourceId, L"Item"));
-		HR((*LotteryBitmaps.rbegin())->Create(target));
-	}
-
-	_brush = new CD2DSolidColorBrush(target, ColorF(ColorF::Green));
-
-	for (auto & scene : _scenes)
-	{
-		scene->CreateDeviceResources(target);
-		scene->CreateDeviceSizeResources(target);
-	}
-}
-
-void MainWindow::CreateDeviceSizeResources(CHwndRenderTarget * target)
-{
-	for (auto & scene : _scenes)
-	{
-		scene->CreateDeviceSizeResources(target);
-	}
 }

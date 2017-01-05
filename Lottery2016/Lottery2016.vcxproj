@@ -154,6 +154,7 @@
   <ItemGroup>
     <ClCompile Include="App.cpp" />
     <ClCompile Include="Box2dScene.cpp" />
+    <ClCompile Include="DxRes.cpp" />
     <ClCompile Include="FlashImageScene.cpp" />
     <ClCompile Include="Items.cpp" />
     <ClCompile Include="MainWindow.cpp" />

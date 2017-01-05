@@ -255,3 +255,4 @@ paket-files/
 /src/Lottery2016/app/lottery/allPerson.ts
 *.jpg
 *.txt
+/src/Lottery2016/wwwroot/Index.html

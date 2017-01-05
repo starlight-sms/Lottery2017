@@ -25,6 +25,9 @@
     <ClCompile Include="LotteryScene.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="DxRes.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Resources">

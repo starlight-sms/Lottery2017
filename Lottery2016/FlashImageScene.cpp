@@ -29,7 +29,7 @@ void FlashImageScene::Update()
 	}	
 }
 
-void FlashImageScene::Render(CHwndRenderTarget * target)
+void FlashImageScene::Render(CHwndRenderTarget * target, DxRes* dxRes)
 {
 	auto windowSize = target->GetSize();
 	auto whRate = windowSize.width / windowSize.height;
@@ -45,19 +45,19 @@ void FlashImageScene::Render(CHwndRenderTarget * target)
 	{
 		auto grid = (int)row < maxRow - 1 ? gridSize : lastGridSize;
 		auto topLeft = Multiple(grid, (float)col, (float)row);
-		auto bmp = _personBitmaps[id];
+		auto bmp = dxRes->PersonBitmaps[id];
 		
 		auto realSize = GetDisplaySize(bmp->GetSize(), grid);
 		auto rect = GetDrawCenterRect(topLeft, grid, realSize);
 		target->DrawBitmap(bmp, rect);
 
 		CString str = GetAllPerson()[id].Name;
-		target->DrawTextW(str, rect, GetColorBrush(target, ColorF::Red), _headerTextFormat);
+		target->DrawTextW(str, rect, dxRes->GetColorBrush(target, ColorF::Red), dxRes->HeaderTextFormat);
 		if (!_started)
 		{
 			CString notes(L"\r\n");
 			notes.Append(GetAllPerson()[id].Notes);
-			target->DrawTextW(notes, rect, GetColorBrush(target, ColorF::OrangeRed), _textFormat);
+			target->DrawTextW(notes, rect, dxRes->GetColorBrush(target, ColorF::OrangeRed), dxRes->TextFormat);
 		}		
 
 		row += ++col / maxCol;
@@ -82,16 +82,5 @@ void FlashImageScene::KeyUp(UINT key)
 		{
 			AfxGetMainWnd()->MessageBoxW(L"此奖项已抽奖完成，可在以下位置开始新的抽奖：\n菜单->抽奖->选择奖项。");
 		}
-	}
-}
-
-void FlashImageScene::CreateDeviceResources(CHwndRenderTarget * target)
-{
-	__super::CreateDeviceResources(target);
-	for (size_t i = 0; i < _allPersonIds.size(); ++i)
-	{
-		auto id = _allPersonIds[i];
-		_personBitmaps[id] = new CD2DBitmap(target, GetAllPerson()[i].ResourceId, L"Person");
-		HR(_personBitmaps[id]->Create(target));
 	}
 }

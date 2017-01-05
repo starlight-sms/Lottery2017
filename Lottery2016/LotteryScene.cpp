@@ -13,18 +13,6 @@ LotteryScene::LotteryScene(int count, int itemId, std::vector<int> personIds) :
 {
 }
 
-void LotteryScene::CreateDeviceSizeResources(CHwndRenderTarget * target)
-{
-	if (_headerTextFormat)
-		_headerTextFormat->Destroy();
-
-	auto size = target->GetSize();
-	auto minEdge = std::min(size.width, size.height);
-	auto real = b2Clamp(minEdge / 40, 12.0f, 24.0f);
-	_headerTextFormat = new CD2DTextFormat(target, L"Consolas", real);
-	_textFormat = new CD2DTextFormat(target, L"Consolas", real * 0.8f);
-}
-
 CD2DSizeF LotteryScene::Divide(CD2DSizeF v, float x, float y)
 {
 	v.width /= x;
@@ -70,19 +58,3 @@ const void LotteryScene::Save()
 {
 	SaveLuckyPersonIds(_itemId, _luckyPersonIds);
 }
-
-CD2DSolidColorBrush * LotteryScene::GetColorBrush(CHwndRenderTarget * target, D2D1::ColorF::Enum color)
-{
-	if (_brushCache.find(color) == _brushCache.end())
-	{
-		_brushCache[color] = new CD2DSolidColorBrush(target, ColorF(color));
-		HR(_brushCache[color]->Create(target));
-	}
-	return _brushCache[color];
-}
-
-void LotteryScene::CreateDeviceResources(CHwndRenderTarget * target)
-{
-	_brushCache.clear();
-}
-
