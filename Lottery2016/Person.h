@@ -17,9 +17,7 @@ struct Person
 
 const std::vector<Person>& GetAllPerson();
 
-std::vector<Person> GetUnluckyPerson();
-
-std::vector<int> GetUnluckyPersonIds();
+std::vector<int> GetUnluckyPersonIds(int itemId);
 
 const void SaveLuckyPersonIds(int itemId, const std::unordered_set<int>& personIds);
 

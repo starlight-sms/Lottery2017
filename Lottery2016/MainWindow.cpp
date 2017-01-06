@@ -61,7 +61,7 @@ void MainWindow::OnLottery(UINT id)
 {
 	auto itemId = id - MenuLotteryStart;
 	auto item = GetItems()[itemId];
-	auto unluckyIds = GetUnluckyPersonIds();
+	auto unluckyIds = GetUnluckyPersonIds(itemId);
 	auto needCount = item.Count;
 
 	if (unluckyIds.empty())
@@ -143,7 +143,7 @@ int MainWindow::OnCreate(LPCREATESTRUCT cs)
 	_dxRes.CreateDeviceResources(GetRenderTarget());
 	_dxRes.CreateDeviceSizeResources(GetRenderTarget());
 
-	CreateScene(GetItems()[0].Count, 0, GetUnluckyPersonIds());
+	CreateScene(GetItems()[0].Count, 0, GetUnluckyPersonIds(0));
 
 	return TRUE;
 }

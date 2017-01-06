@@ -11,6 +11,7 @@ using namespace std::experimental::filesystem;
 
 bool inited = false;
 static unordered_map<int, vector<int>> luckIds;
+const vector<int>& GetNewerPersonIds();
 
 vector<int> GetLuckyPersonIds(int itemId)
 {
@@ -33,8 +34,9 @@ vector<int> GetLuckyPersonIds(int itemId)
 			}
 			return move(result);
 		}
+		return vector<int>{};
 	}
-	return vector<int>{};
+	return GetNewerPersonIds();
 }
 
 std::vector<Person> PersonIdsToPersons(const std::vector<int>& workIds)
@@ -90,17 +92,11 @@ const void SaveLuckyPersonIds(int itemId, const unordered_set<int>& personWorkId
 	}
 }
 
-std::vector<Person> GetUnluckyPerson()
-{
-	auto ids = GetUnluckyPersonIds();
-	return PersonIdsToPersons(ids);
-}
-
-std::vector<int> GetUnluckyPersonIds()
+std::vector<int> GetUnluckyPersonIds(int itemId)
 {
 	vector<int> allPersonIds(GetAllPerson().size());
 
-	for (size_t i = 0; i < GetItems().size(); ++i)
+	for (size_t i = 0; i < GetItems().size() + (GetItems()[itemId].Count < 15); ++i)
 	{
 		auto luckyIds = GetLuckyPersonIds(i);
 		for (auto id : luckyIds)
@@ -125,6 +121,15 @@ Person::Person(const int id, const wchar_t * name, const UINT resourceId, const 
 {
 }
 
+const vector<int>& GetNewerPersonIds()
+{
+	static vector<int> result = 
+	{
+		1,3,5,7,9
+	};
+
+	return result;
+}
 
 const vector<Person>& GetAllPerson()
 {
