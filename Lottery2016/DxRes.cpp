@@ -2,6 +2,7 @@
 #include "DxRes.h"
 #include "Items.h"
 #include "Person.h"
+#include "Resources\resource.h"
 using D2D1::ColorF;
 using D2D1::Matrix3x2F;
 
@@ -23,6 +24,8 @@ void DxRes::CreateDeviceResources(CHwndRenderTarget * target)
 		PersonBitmaps[i] = new CD2DBitmap(target, GetAllPerson()[i].ResourceId, L"Person");
 		HR(PersonBitmaps[i]->Create(target));
 	}
+
+	Background = new CD2DBitmap(target, IDR_BACKGROUND1, L"Background");
 }
 
 void DxRes::CreateDeviceSizeResources(CHwndRenderTarget * target)

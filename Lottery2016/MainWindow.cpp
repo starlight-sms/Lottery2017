@@ -8,6 +8,7 @@
 #include "DxRes.h"
 
 using D2D1::ColorF;
+using D2D1::Matrix3x2F;
 using namespace std;
 
 const UINT ControlCombox = 1;
@@ -168,7 +169,20 @@ LRESULT MainWindow::OnDraw2D(WPARAM, LPARAM lparam)
 	GetClientRect(&rect);
 	CD2DRectF d2dRect{ (float)rect.left, (float)rect.top, (float)rect.right, (float)rect.bottom };
 
-	target->DrawBitmap(_dxRes.LotteryBitmaps[GetLotteryId()], d2dRect);
+	target->DrawBitmap(_dxRes.Background, d2dRect);
+
+	{
+		auto bmp = _dxRes.LotteryBitmaps[GetLotteryId()];
+		auto width = d2dRect.right - d2dRect.left;
+		auto height = d2dRect.bottom - d2dRect.top;
+		auto scale = 1.f / 3;
+		target->SetTransform(
+			Matrix3x2F::Scale(scale, scale) *
+			Matrix3x2F::Translation(width * (1 - scale) - 10, height * (1 - scale) - 10)
+		);
+		target->DrawBitmap(bmp, d2dRect);
+		target->SetTransform(Matrix3x2F::Identity());
+	}
 
 	for (auto& scene : _scenes)
 	{

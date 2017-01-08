@@ -16,6 +16,7 @@ public:
 
 	CD2DTextFormat *HeaderTextFormat, *TextFormat;
 	std::vector<CD2DBitmap*> LotteryBitmaps;
+	CD2DBitmap* Background;
 	std::unordered_map<int, CD2DBitmapBrush *> PersonBrushes;
 	std::unordered_map<float, RectangleGeometry*> BorderGeometries;
 	std::unordered_map<int, CD2DBitmap*> PersonBitmaps;
