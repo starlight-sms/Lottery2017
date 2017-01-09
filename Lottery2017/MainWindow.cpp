@@ -31,7 +31,7 @@ END_MESSAGE_MAP()
 
 MainWindow::MainWindow()
 {
-	Create(nullptr, L"Lottery 2016", WS_OVERLAPPEDWINDOW, { 100, 100, 800, 600 });
+	Create(nullptr, L"Lottery 2017", WS_OVERLAPPEDWINDOW, { 100, 100, 800, 600 });
 }
 
 void MainWindow::Update()
