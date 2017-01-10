@@ -38,7 +38,7 @@ void Box2dScene::Update()
 	if (_state == State::Started)
 	{
 		_world.Step(1 / 30.0f, 6, 2);
-		if (++_updateCount == 150)
+		if (++_updateCount == 100)
 		{
 			_world.SetGravity({ 0, 0 });
 		}
@@ -47,6 +47,10 @@ void Box2dScene::Update()
 	{
 		_world.Step(1 / 300.0f, 6, 2);
 		FindLuckyPersons();
+	}
+	else if (_state == State::Completed)
+	{
+		++_updateCount;
 	}
 }
 
@@ -63,7 +67,7 @@ void Box2dScene::Render(CHwndRenderTarget * target, DxRes* dxRes)
 		auto length = (INT_PTR)border->GetUserData() / 100.0f;
 		auto shape = (b2PolygonShape*)border->GetFixtureList()->GetShape();
 		target->FillGeometry(
-			dxRes->GetOrCreateBorderGeometry(target, length, BorderWidth), 
+			dxRes->GetOrCreateBorderGeometry(target, length, BorderWidth),
 			dxRes->GetColorBrush(target, _borderColor));
 	}
 
@@ -102,6 +106,10 @@ void Box2dScene::Render(CHwndRenderTarget * target, DxRes* dxRes)
 	}
 
 	target->SetTransform(Matrix3x2F::Identity());
+	if (_state == State::Completed)
+	{
+		ShowWinner(target, dxRes);
+	}
 }
 
 void Box2dScene::KeyUp(UINT key)
@@ -116,6 +124,39 @@ void Box2dScene::KeyUp(UINT key)
 		{
 			EnterTriggerMode();
 		}
+	}
+}
+
+void Box2dScene::ShowWinner(CHwndRenderTarget * target, DxRes * dxRes)
+{
+	auto windowSize = target->GetSize();
+	auto whRate = windowSize.width / windowSize.height;
+	auto maxCol = (int)ceil(sqrt(_requiredCount * whRate));
+	auto maxRow = (int)ceil(1.0 * _requiredCount / maxCol);
+
+	auto gridSize = Divide(windowSize, (float)maxCol, (float)maxRow);
+	auto lastCol = _requiredCount - (maxRow - 1) * maxCol;
+	auto lastGridSize = Divide(windowSize, (float)lastCol, (float)maxRow);
+
+	int col = 0, row = 0;
+	for (auto id : _luckyPersonIds)
+	{
+		auto grid = (int)row < maxRow - 1 ? gridSize : lastGridSize;
+		auto topLeft = Multiple(grid, (float)col, (float)row);
+		auto bmp = dxRes->PersonBitmaps[id];
+
+		auto realSize = GetDisplaySize(bmp->GetSize(), grid);
+		auto rect = GetDrawCenterRect(topLeft, grid, realSize);
+		target->DrawBitmap(bmp, rect, b2Clamp(_updateCount / 200.0f, 0.f, 1.0f));
+
+		CString str = GetAllPerson()[id].Name;
+		target->DrawTextW(str, rect, dxRes->GetColorBrush(target, ColorF::Red), dxRes->HeaderTextFormat);
+		CString notes(L"\r\n");
+		notes.Append(GetAllPerson()[id].Notes);
+		target->DrawTextW(notes, rect, dxRes->GetColorBrush(target, ColorF::OrangeRed), dxRes->TextFormat);
+
+		row += ++col / maxCol;
+		col = col % maxCol;
 	}
 }
 
@@ -197,6 +238,7 @@ void Box2dScene::FindLuckyPersons()
 void Box2dScene::CompleteAndSave()
 {
 	_state = State::Completed;
+	_updateCount = 0;
 	Save();
 }
 

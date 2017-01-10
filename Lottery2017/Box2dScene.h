@@ -12,6 +12,7 @@ public:
 	virtual void KeyUp(UINT key) override;
 
 private:
+	void ShowWinner(CHwndRenderTarget* target, DxRes* dxRes);
 	const float RelativeSize = 10.0f;
 	const float BorderWidth = RelativeSize / 100;
 
