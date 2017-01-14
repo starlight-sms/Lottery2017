@@ -2,13 +2,11 @@
 
 struct Person
 {
-	int             WorkId;
 	const wchar_t * Name;
 	UINT            ResourceId;
 	const wchar_t * Notes;
 
 	Person(
-		const int id,
 		const wchar_t *name,
 		const UINT resourceId,
 		const wchar_t* notes
