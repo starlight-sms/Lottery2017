@@ -12,9 +12,13 @@ namespace LotteryGen
         static void Main(string[] args)
         {
             var excels = ExcelUtil.ReadExcelToNameQuotes(AppConfig.ExcelPath);
-            var images = ImageUtil.GetImages(AppConfig.Source);            
+            var images = ImageUtil.GetImages(AppConfig.Source);
+
             ProcessUtil.CheckConflicts(excels, images);
-            ProcessUtil.WritePersonConfig(AppConfig.Dest, excels);
+                        
+            ProcessUtil.WritePersonConfig(AppConfig.Dest, excels);            
+            
+            ProcessUtil.ProcessImages(AppConfig.Dest, excels, images);            
         }
     }
 }
