@@ -34,14 +34,17 @@ void DxRes::CreateDeviceSizeResources(CHwndRenderTarget * target)
 	{
 		HeaderTextFormat->Destroy();
 		TextFormat->Destroy();
+		H1TextFormat->Destroy();
 		delete HeaderTextFormat;
 		delete TextFormat;
+		delete H1TextFormat;
 	}		
 
 	auto size = target->GetSize();
 	auto minEdge = std::min(size.width, size.height);
 	auto real = b2Clamp(minEdge / 40, 12.0f, 24.0f);
 	HeaderTextFormat = new CD2DTextFormat(target, L"Consolas", real);
+	H1TextFormat = new CD2DTextFormat(target, L"Consolas", real * 5);
 	TextFormat = new CD2DTextFormat(target, L"Consolas", real * 0.8f);
 
 	for (auto& kv : PersonBrushes)

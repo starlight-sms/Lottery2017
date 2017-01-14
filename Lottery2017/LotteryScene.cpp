@@ -13,21 +13,21 @@ LotteryScene::LotteryScene(int count, int itemId, std::vector<int> personIds) :
 {
 }
 
-CD2DSizeF LotteryScene::Divide(CD2DSizeF v, float x, float y)
+CD2DSizeF Scene::Divide(CD2DSizeF v, float x, float y)
 {
 	v.width /= x;
 	v.height /= y;
 	return v;
 }
 
-CD2DSizeF LotteryScene::Multiple(CD2DSizeF v, float x, float y)
+CD2DSizeF Scene::Multiple(CD2DSizeF v, float x, float y)
 {
 	v.width *= x;
 	v.height *= y;
 	return v;
 }
 
-CD2DSizeF LotteryScene::GetDisplaySize(const CD2DSizeF & inputSize, const CD2DSizeF & scaleSize)
+CD2DSizeF Scene::GetDisplaySize(const CD2DSizeF & inputSize, const CD2DSizeF & scaleSize)
 {
 	auto inputRate = inputSize.width / inputSize.height;
 	auto clampRate = scaleSize.width / scaleSize.height;
@@ -44,7 +44,7 @@ CD2DSizeF LotteryScene::GetDisplaySize(const CD2DSizeF & inputSize, const CD2DSi
 	return Divide(inputSize, scale, scale);
 }
 
-CD2DRectF LotteryScene::GetDrawCenterRect(const CD2DSizeF & topLeft, const CD2DSizeF & gridSize, const CD2DSizeF & realSize)
+CD2DRectF Scene::GetDrawCenterRect(const CD2DSizeF & topLeft, const CD2DSizeF & gridSize, const CD2DSizeF & realSize)
 {
 	return CD2DRectF(
 		topLeft.width + (gridSize.width - realSize.width) / 2,

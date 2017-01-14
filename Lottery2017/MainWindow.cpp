@@ -4,6 +4,7 @@
 #include "Resources\resource.h"
 #include "Person.h"
 #include "FlashImageScene.h"
+#include "LuckyScene.h"
 #include "Box2dScene.h"
 #include "DxRes.h"
 
@@ -104,17 +105,8 @@ void MainWindow::OnStatus(UINT id)
 {
 	auto itemId = id - MenuStatusStart();
 	auto ids = GetLuckyPersonIds(itemId);
-	if (ids.size() == 0)
-	{
-		CString str;
-		str.Format(L"%s 目前无人获奖。", GetItems()[itemId].Name);
-		MessageBoxW(str);
-	}
-	else
-	{
-		auto path = CreateLuckyStatusFile(itemId, ids);
-		ShellExecuteW(GetSafeHwnd(), nullptr, path, nullptr, nullptr, SW_SHOW);
-	}
+	_scenes.clear();
+	CreateScene(-1, itemId, ids);
 }
 
 int MainWindow::OnCreate(LPCREATESTRUCT cs)
@@ -207,7 +199,11 @@ LRESULT MainWindow::CreateDeviceResources(WPARAM, LPARAM lparam)
 
 void MainWindow::CreateScene(int count, int itemId, const std::vector<int>& personIds)
 {
-	if (itemId != 3)
+	if (count == -1)
+	{
+		_scenes.emplace_back(make_unique<LuckyScene>(itemId, personIds));
+	}
+	else if (itemId != 3)
 	{
 		_scenes.emplace_back(make_unique<Box2dScene>(count, itemId, personIds));
 	}

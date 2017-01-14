@@ -60,22 +60,6 @@ void DeleteLuckyPersons()
 	}
 }
 
-CString CreateLuckyStatusFile(int itemId, std::vector<int>& personIds)
-{
-	locale loc("chs");
-	wfstream fs{ "temp.txt", ios::trunc | ios::out};
-	fs.imbue(loc);
-
-	auto persons = PersonIdsToPersons(personIds);
-	fs << GetItems()[itemId].Name << L" 的获奖名单如下：" << endl;
-	for (auto& person : persons)
-	{
-		fs << L"姓名: " << person.Name << L"\t" << L"工号: " << person.WorkId << endl;
-	}
-	fs << "=========";
-	return L"temp.txt";
-}
-
 const void SaveLuckyPersonIds(int itemId, const unordered_set<int>& personWorkIds)
 {
 	vector<int> existing = GetLuckyPersonIds(itemId);

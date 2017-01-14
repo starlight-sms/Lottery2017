@@ -26,5 +26,3 @@ std::vector<int> GetLuckyPersonIds(int itemId);
 std::vector<Person> PersonIdsToPersons(const std::vector<int>& personIds);
 
 void DeleteLuckyPersons();
-
-CString CreateLuckyStatusFile(int itemId, std::vector<int>& personIds);

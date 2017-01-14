@@ -1,6 +1,6 @@
 #pragma once
 
-class LotteryScene;
+class Scene;
 class MainWindowRes;
 class FlashImageScene;
 #include "DxRes.h"
@@ -29,7 +29,7 @@ private:
 		
 	CMenu _menu;	
 	size_t GetLotteryId();
-	std::vector<std::unique_ptr<LotteryScene>> _scenes;
+	std::vector<std::unique_ptr<Scene>> _scenes;
 
 	DxRes _dxRes;
 };

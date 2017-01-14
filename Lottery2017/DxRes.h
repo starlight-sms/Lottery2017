@@ -14,7 +14,7 @@ public:
 	CD2DSolidColorBrush* GetColorBrush(CHwndRenderTarget*, D2D1::ColorF::Enum color);
 	RectangleGeometry* GetOrCreateBorderGeometry(CHwndRenderTarget* target, float w, float h);
 
-	CD2DTextFormat *HeaderTextFormat, *TextFormat;
+	CD2DTextFormat *HeaderTextFormat, *TextFormat, *H1TextFormat;
 	std::vector<CD2DBitmap*> LotteryBitmaps;
 	CD2DBitmap* Background;
 	std::unordered_map<int, CD2DBitmapBrush *> PersonBrushes;
