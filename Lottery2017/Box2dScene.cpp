@@ -147,7 +147,7 @@ void Box2dScene::ShowWinner(CHwndRenderTarget * target, DxRes * dxRes)
 
 		auto realSize = GetDisplaySize(bmp->GetSize(), grid);
 		auto rect = GetDrawCenterRect(topLeft, grid, realSize);
-		auto op = b2Clamp(_updateCount / 200.0f, 0.f, 1.0f);
+		auto op = b2Clamp(_updateCount / 120.0f, 0.f, 1.0f);
 		target->DrawBitmap(bmp, rect, op);
 
 		CString str = GetAllPerson()[id].Name;

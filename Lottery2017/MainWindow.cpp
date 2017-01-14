@@ -181,12 +181,6 @@ LRESULT MainWindow::OnDraw2D(WPARAM, LPARAM lparam)
 		scene->Render(target, &_dxRes);
 	}
 
-	SYSTEMTIME st;
-	GetLocalTime(&st);
-	CString str;
-	str.Format(L"%d", st.wMilliseconds);
-	target->DrawTextW(str, d2dRect, _dxRes.GetColorBrush(target, ColorF::Blue));
-
 	return TRUE;
 }
 

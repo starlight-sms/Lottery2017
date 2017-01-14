@@ -45,7 +45,7 @@ namespace LotteryGen
             Console.WriteLine();
 
             var id = 0;
-            const int MinEdge = 400;
+            const int MinEdge = 200;
             foreach (var _ in excels)
             {
                 ++id;
