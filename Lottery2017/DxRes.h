@@ -2,7 +2,7 @@
 
 class RectangleGeometry;
 
-const float PersonSize = 0.40f;
+const float PersonSize = 0.45f;
 
 class DxRes
 {

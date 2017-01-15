@@ -38,14 +38,14 @@ void Box2dScene::Update()
 	if (_state == State::Started)
 	{
 		_world.Step(1 / 30.0f, 6, 2);
-		if (++_updateCount == 100)
+		if (++_updateCount == 30)
 		{
 			_world.SetGravity({ 0, 0 });
 		}
 	}
 	else if (_state == State::Triggled)
 	{
-		_world.Step(1 / 300.0f, 6, 2);
+		_world.Step(1 / 600.0f, 6, 2);
 		FindLuckyPersons();
 	}
 	else if (_state == State::Completed)
@@ -214,7 +214,7 @@ b2Body * Box2dScene::CreatePersonBody(int personId)
 	shape.SetAsBox(H, H);
 	b2FixtureDef fixtureDef;
 	fixtureDef.shape = &shape;
-	fixtureDef.density = 5;
+	fixtureDef.density = 1;
 	fixtureDef.friction = 0;
 	fixtureDef.restitution = 1;
 	body->CreateFixture(&fixtureDef);

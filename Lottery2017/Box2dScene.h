@@ -42,5 +42,5 @@ private:
 	void EnterTriggerMode();
 
 	// dxres
-	D2D1::ColorF::Enum _borderColor = D2D1::ColorF::LightGray, _luckyColor = D2D1::ColorF::Yellow;
+	D2D1::ColorF::Enum _borderColor = D2D1::ColorF::DarkGray, _luckyColor = D2D1::ColorF::DarkRed;
 };
