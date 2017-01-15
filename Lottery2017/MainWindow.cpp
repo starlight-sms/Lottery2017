@@ -127,7 +127,7 @@ int MainWindow::OnCreate(LPCREATESTRUCT cs)
 	_menu.GetSubMenu(1)->RemoveMenu(0, 0);
 	_menu.GetSubMenu(2)->RemoveMenu(0, 0);
 	_menu.GetSubMenu(2)->AppendMenuW(MF_SEPARATOR);
-	_menu.GetSubMenu(2)->AppendMenuW(MF_STRING, MenuStatusClear(), L"Çå³ý×´Ì¬(&C)");
+	_menu.GetSubMenu(2)->AppendMenuW(MF_STRING, MenuStatusClear(), L"Çå³ý×´Ì¬(&0)");
 	_menu.CheckMenuRadioItem(MenuLotteryStart, MenuLotteryLast(), MenuLotteryStart, MF_BYCOMMAND);
 	SetMenu(&_menu);
 
@@ -165,15 +165,16 @@ LRESULT MainWindow::OnDraw2D(WPARAM, LPARAM lparam)
 
 	{
 		auto bmp = _dxRes.LotteryBitmaps[GetLotteryId()];
-		auto width = d2dRect.right - d2dRect.left;
-		auto height = d2dRect.bottom - d2dRect.top;
-		auto scale = 1.f / 3;
-		target->SetTransform(
-			Matrix3x2F::Scale(scale, scale) *
-			Matrix3x2F::Translation(width * (1 - scale) - 10, height * (1 - scale) - 10)
-		);
-		target->DrawBitmap(bmp, d2dRect);
-		target->SetTransform(Matrix3x2F::Identity());
+		auto width = (d2dRect.right - d2dRect.left) / 3;
+		auto bmpSize = bmp->GetSize();
+		auto scale = width / bmpSize.width;
+		target->DrawBitmap(bmp, 
+		{ 
+			width * 2 - 10, 
+			d2dRect.bottom - d2dRect.top - (bmpSize.height * scale) - 10,
+			width * 2 - 10 + bmpSize.width * scale,
+			d2dRect.bottom - d2dRect.top - (bmpSize.height * scale) - 10 + bmpSize.height * scale
+		});
 	}
 
 	for (auto& scene : _scenes)
