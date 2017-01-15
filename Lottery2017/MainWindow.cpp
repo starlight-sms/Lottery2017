@@ -120,7 +120,7 @@ int MainWindow::OnCreate(LPCREATESTRUCT cs)
 		auto statusMenu = _menu.GetSubMenu(2);
 
 		CString str;
-		str.Format(L"%s(&%d)", item.Name, i + 1);
+		str.Format(L"%s (&%c)", item.Name, 'A' + i);
 		lotteryMenu->AppendMenuW(MF_STRING, MenuLotteryStart + i, str);
 		statusMenu->AppendMenuW(MF_STRING, MenuStatusStart() + i, str);
 	}
