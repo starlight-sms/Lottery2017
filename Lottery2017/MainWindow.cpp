@@ -197,7 +197,7 @@ void MainWindow::CreateScene(int count, int itemId, const std::vector<int>& pers
 	{
 		_scenes.emplace_back(make_unique<LuckyScene>(itemId, personIds));
 	}
-	else if (count <= 10)
+	else if (count <= 5)
 	{
 		_scenes.emplace_back(make_unique<Box2dScene>(count, itemId, personIds));
 	}
