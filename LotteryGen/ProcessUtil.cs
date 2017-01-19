@@ -13,7 +13,7 @@ namespace LotteryGen
     public static class ProcessUtil
     {
         public static void WritePersonConfig(string destination,
-            Dictionary<string, string> excels)
+            Dictionary<string, Person> excels)
         {
             Console.WriteLine(nameof(ProcessUtil.WritePersonConfig));
             Console.WriteLine();
@@ -26,7 +26,7 @@ namespace LotteryGen
                 var id = 1;
                 foreach (var kv in excels)
                 {
-                    writer.WriteLine(string.Format(Template, kv.Key, id, kv.Value));
+                    writer.WriteLine(string.Format(Template, kv.Key, id, kv.Value.Quote));
                     Console.SetCursorPosition(0, Console.CursorTop - 1);
                     Console.WriteLine($"{id}/{excels.Count}...");
                     ++id;
@@ -36,9 +36,16 @@ namespace LotteryGen
             Console.WriteLine("Done.");
         }
 
+        internal static void WriteNews(string dest, Dictionary<string, Person> excels)
+        {
+            File.WriteAllText(Path.Combine(dest, "news.txt"), string.Join(", ", excels
+                .Where(x => x.Value.IsNew)
+                .Select(x => x.Value.Id)));
+        }
+
         public static void ProcessImages(
             string destination,
-            Dictionary<string, string> excels,
+            List<string> names,
             Dictionary<string, string> images)
         {
             Console.WriteLine(nameof(ProcessUtil.ProcessImages));
@@ -46,10 +53,9 @@ namespace LotteryGen
 
             var id = 0;
             const int MinEdge = 300;
-            foreach (var _ in excels)
+            foreach (var name in names)
             {
                 ++id;
-                var name = _.Key;
                 if (!images.ContainsKey(name)) continue;
 
                 var oldFile = images[name];
@@ -96,7 +102,7 @@ namespace LotteryGen
                         newImg.Save($"{Path.Combine(destination, id.ToString())}.jpg", ImageFormat.Jpeg);
 
                         Console.SetCursorPosition(0, Console.CursorTop - 1);
-                        Console.WriteLine($"{id}/{excels.Count}...");
+                        Console.WriteLine($"{id}/{names.Count}...");
                     }
                 }
             }
@@ -105,17 +111,17 @@ namespace LotteryGen
         }
 
         public static void CheckConflicts(
-            Dictionary<string, string> excels, 
+            IEnumerable<string> names, 
             Dictionary<string, string> images)
         {
-            var excelsExcept = excels.Keys.Except(images.Keys).ToList();
+            var excelsExcept = names.Except(images.Keys).ToList();
             if (excelsExcept.Count > 0)
             {
                 Console.WriteLine("Names existed in excel, but not in images: ");
                 Console.WriteLine(string.Join("\t", excelsExcept));
             }
 
-            var imagesExcept = images.Keys.Except(excels.Keys).ToList();
+            var imagesExcept = images.Keys.Except(names).ToList();
             if (imagesExcept.Count > 0)
             {
                 Console.WriteLine("Names existed in images, but not in excel: ");
