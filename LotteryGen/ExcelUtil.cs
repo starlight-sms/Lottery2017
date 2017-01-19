@@ -23,9 +23,9 @@ namespace LotteryGen
                 {
                     var p = new Person
                     {
-                        Id = row, 
-                        Name = cells[row, 1].GetValue<string>(), 
-                        Quote = cells[row, 2].GetValue<string>(), 
+                        Id = row - 1,
+                        Name = cells[row, 1].GetValue<string>(),
+                        Quote = cells[row, 2].GetValue<string>(),
                         IsNew = !string.IsNullOrWhiteSpace(cells[row, 3].GetValue<string>())
                     };
                     if (p.Name == null) break;

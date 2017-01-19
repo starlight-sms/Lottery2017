@@ -45,7 +45,7 @@ void Box2dScene::Update()
 	}
 	else if (_state == State::Triggled)
 	{
-		_world.Step(1 / 600.0f, 6, 2);
+		_world.Step(1 / 1200.0f, 6, 2);
 		FindLuckyPersons();
 	}
 	else if (_state == State::Completed)
@@ -154,14 +154,14 @@ void Box2dScene::ShowWinner(CHwndRenderTarget * target, DxRes * dxRes)
 		
 		CD2DSolidColorBrush* color;
 
-		color = dxRes->GetColorBrush(target, ColorF::Red);
+		color = dxRes->GetColorBrush(target, ColorF::Purple);
 		color->SetOpacity(op);
 		target->DrawTextW(str, rect, color, dxRes->HeaderTextFormat);
 		color->SetOpacity(1.0f);
 
 		CString notes(L"\r\n");
 		notes.Append(GetAllPerson()[id].Notes);		
-		color = dxRes->GetColorBrush(target, ColorF::OrangeRed);
+		color = dxRes->GetColorBrush(target, ColorF::Purple);
 		color->SetOpacity(op);
 		target->DrawTextW(notes, rect, color, dxRes->TextFormat);
 		color->SetOpacity(1.0f);
@@ -216,7 +216,7 @@ b2Body * Box2dScene::CreatePersonBody(int personId)
 	fixtureDef.shape = &shape;
 	fixtureDef.density = 1;
 	fixtureDef.friction = 0;
-	fixtureDef.restitution = 1;
+	fixtureDef.restitution = 1.1f;
 	body->CreateFixture(&fixtureDef);
 
 	return body;
