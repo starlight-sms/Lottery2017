@@ -48,13 +48,6 @@ void LuckyScene::Render(CHwndRenderTarget * target, DxRes* dxRes)
 		CString str = GetAllPerson()[id].Name;
 		target->DrawTextW(str, rect, dxRes->GetColorBrush(target, ColorF::Red), dxRes->HeaderTextFormat);
 
-		if (_luckyPersonIds.size() <= 30)
-		{
-			CString notes(L"\r\n");
-			notes.Append(GetAllPerson()[id].Notes);
-			target->DrawTextW(notes, rect, dxRes->GetColorBrush(target, ColorF::OrangeRed), dxRes->TextFormat);
-		}
-
 		row += ++col / maxCol;
 		col = col % maxCol;
 	}

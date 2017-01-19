@@ -52,13 +52,7 @@ void FlashImageScene::Render(CHwndRenderTarget * target, DxRes* dxRes)
 		target->DrawBitmap(bmp, rect);
 
 		CString str = GetAllPerson()[id].Name;
-		target->DrawTextW(str, rect, dxRes->GetColorBrush(target, ColorF::Red), dxRes->HeaderTextFormat);
-		if (!_started)
-		{
-			CString notes(L"\r\n");
-			notes.Append(GetAllPerson()[id].Notes);
-			target->DrawTextW(notes, rect, dxRes->GetColorBrush(target, ColorF::OrangeRed), dxRes->TextFormat);
-		}		
+		target->DrawTextW(str, rect, dxRes->GetColorBrush(target, ColorF::Red), dxRes->HeaderTextFormat);	
 
 		row += ++col / maxCol;
 		col = col % maxCol;
