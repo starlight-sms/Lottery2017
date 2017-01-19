@@ -93,15 +93,9 @@ void Box2dScene::Render(CHwndRenderTarget * target, DxRes* dxRes)
 
 			CD2DRectF nameRect{
 				X - scale * 1.5f,
-				Y - 20,
+				Y,
 				X, Y + 300 };
 			target->DrawTextW(person.Name, nameRect, color, dxRes->HeaderTextFormat);
-
-			CD2DRectF notesRect{
-				X - scale * 4,
-				Y,
-				X,Y + 300 };
-			target->DrawTextW(person.Notes, notesRect, color, dxRes->TextFormat);
 		}
 	}
 
@@ -150,20 +144,17 @@ void Box2dScene::ShowWinner(CHwndRenderTarget * target, DxRes * dxRes)
 		auto op = b2Clamp(_updateCount / 120.0f, 0.f, 1.0f);
 		target->DrawBitmap(bmp, rect, op);
 
-		CString str = GetAllPerson()[id].Name;
-		
+		CString str = GetAllPerson()[id].Name;		
 		CD2DSolidColorBrush* color;
 
-		color = dxRes->GetColorBrush(target, ColorF::Purple);
+		if (_requiredCount == 1)
+		{
+			str.AppendFormat(L"\r\n\r\n%s", GetAllPerson()[id].Notes);
+		}
+		
+		color = dxRes->GetColorBrush(target, ColorF::Blue);
 		color->SetOpacity(op);
 		target->DrawTextW(str, rect, color, dxRes->HeaderTextFormat);
-		color->SetOpacity(1.0f);
-
-		CString notes(L"\r\n");
-		notes.Append(GetAllPerson()[id].Notes);		
-		color = dxRes->GetColorBrush(target, ColorF::Purple);
-		color->SetOpacity(op);
-		target->DrawTextW(notes, rect, color, dxRes->TextFormat);
 		color->SetOpacity(1.0f);
 
 		row += ++col / maxCol;

@@ -46,7 +46,7 @@ void LuckyScene::Render(CHwndRenderTarget * target, DxRes* dxRes)
 		target->DrawBitmap(bmp, rect);
 
 		CString str = GetAllPerson()[id].Name;
-		target->DrawTextW(str, rect, dxRes->GetColorBrush(target, ColorF::Purple), dxRes->HeaderTextFormat);
+		target->DrawTextW(str, rect, dxRes->GetColorBrush(target, ColorF::Blue), dxRes->HeaderTextFormat);
 
 		row += ++col / maxCol;
 		col = col % maxCol;
@@ -60,7 +60,7 @@ void LuckyScene::RenderNoLuckyPerson(CHwndRenderTarget * target, DxRes * dxRes)
 
 	CString str;
 	str.Format(L"%s 目前无人中奖。", GetItems()[_itemId].Name);
-	target->DrawTextW(str, rect, dxRes->GetColorBrush(target, ColorF::Yellow), dxRes->H1TextFormat);
+	target->DrawTextW(str, rect, dxRes->GetColorBrush(target, ColorF::Blue), dxRes->H1TextFormat);
 }
 
 void LuckyScene::KeyUp(UINT key)

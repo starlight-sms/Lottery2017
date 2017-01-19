@@ -23,8 +23,8 @@ const std::vector<Item>& GetItems()
 		Item(L"阳光普照奖x30-立白洗衣液",				30, IDR_ITEM8),
 		Item(L"特别奖-丁总-戴尔27寸曲面屏显示器",		1,  IDR_ITEM9),
 		Item(L"特别奖-李茂-京东e卡",					1,  IDR_ITEM10),
-		Item(L"特别奖-杨秀东-iPad mini2",			1,  IDR_ITEM11),
-		Item(L"特别奖-吴晓研-SKⅡ神仙水 330ml",		1,  IDR_ITEM12),
+		Item(L"特别奖-杨秀冬-iPad mini2",			1,  IDR_ITEM11),
+		Item(L"特别奖-吴晓妍-SKⅡ神仙水 330ml",		1,  IDR_ITEM12),
 	};
 	return result;
 }
