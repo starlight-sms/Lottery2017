@@ -256,3 +256,4 @@ paket-files/
 *.jpg
 *.txt
 /src/Lottery2016/wwwroot/Index.html
+*.png

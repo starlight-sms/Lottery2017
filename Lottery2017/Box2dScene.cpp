@@ -259,15 +259,15 @@ void Box2dScene::EnterTriggerMode()
 	auto A = RelativeSize;
 	auto H = A / 2;
 	auto P2 = XM_PIDIV2;
-	auto A61 = A / 6;
-	auto A65 = A61 * 5;
-	auto A3 = A / 3;
+	auto A81 = A / 8;
+	auto A87 = A81 * 7;
+	auto A4 = A / 4;
 	auto rightBorder = _borders.begin() + 2;
 	_world.DestroyBody(*rightBorder);
 	_borders.erase(rightBorder);
 
-	_borders.push_back(CreateBorderBody(A, A61, P2, A3));
-	_borders.push_back(CreateBorderBody(A, A65, P2, A3));
+	_borders.push_back(CreateBorderBody(A, A81, P2, A4));
+	_borders.push_back(CreateBorderBody(A, A87, P2, A4));
 	_borders.push_back(CreateBorderBody(A + H, H, P2, A*0.9f));
 }
 
