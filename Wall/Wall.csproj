@@ -66,6 +66,7 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="js\jqthumb.min.js" />
     <Content Include="packages.config" />
     <None Include="Properties\PublishProfiles\file.pubxml" />
     <None Include="Web.Debug.config">
