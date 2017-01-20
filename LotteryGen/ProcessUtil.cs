@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -34,6 +35,38 @@ namespace LotteryGen
             }
 
             Console.WriteLine("Done.");
+        }
+
+        internal static void GenerateWallJson(string dest, List<Person> list)
+        {
+            dest = Path.Combine(dest, "new", "data.js");
+            var json = JsonConvert.SerializeObject(list.Select(x => new
+            {
+                姓名 = x.Name, 
+                总结 = x.Quote
+            }), Formatting.Indented);
+            File.WriteAllText(dest, "var data = " + json);
+        }
+
+        internal static void CopyImagesToNames(string dest, List<Person> persons)
+        {
+            Console.WriteLine(nameof(ProcessUtil.CopyImagesToNames));
+            Console.WriteLine();
+
+            var newFolder = Path.Combine(dest, "new");
+            Directory.CreateDirectory(newFolder);
+
+            foreach (var person in persons)
+            {
+                var oldFile = Path.Combine(dest, $"{person.Id + 1}.jpg");
+                var newFile = Path.Combine(newFolder, $"{person.Name}.jpg");
+                File.Copy(oldFile, newFile, true);
+
+                Console.SetCursorPosition(0, Console.CursorTop - 1);
+                Console.WriteLine($"{person.Id + 1}/{persons.Count}...");
+            }
+
+            Console.WriteLine("Done");
         }
 
         internal static void WriteNews(string dest, Dictionary<string, Person> excels)
@@ -111,7 +144,7 @@ namespace LotteryGen
         }
 
         public static void CheckConflicts(
-            IEnumerable<string> names, 
+            IEnumerable<string> names,
             Dictionary<string, string> images)
         {
             var excelsExcept = names.Except(images.Keys).ToList();

@@ -61,6 +61,8 @@ void Box2dScene::Render(CHwndRenderTarget * target, DxRes* dxRes)
 	auto size = target->GetSize();
 	auto scale = 0.1f * min(size.width, size.height);
 
+	target->FillRectangle(CD2DRectF(0.f, 0.f, size.width, size.height), dxRes->GetColorBrush(target, ColorF::Black, 0.5f));
+
 	for (auto border : _borders)
 	{
 		PreRenderBody(target, border, scale);

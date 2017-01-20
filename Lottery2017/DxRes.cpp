@@ -66,11 +66,11 @@ void DxRes::ClearDeviceResources()
 	_brushCache.clear();
 }
 
-CD2DSolidColorBrush * DxRes::GetColorBrush(CHwndRenderTarget *target, D2D1::ColorF::Enum color)
+CD2DSolidColorBrush * DxRes::GetColorBrush(CHwndRenderTarget *target, D2D1::ColorF::Enum color, float alpha)
 {
 	if (_brushCache.find(color) == _brushCache.end())
 	{
-		_brushCache[color] = new CD2DSolidColorBrush(target, ColorF(color));
+		_brushCache[color] = new CD2DSolidColorBrush(target, ColorF(color, alpha));
 		HR(_brushCache[color]->Create(target));
 	}
 	return _brushCache[color];
