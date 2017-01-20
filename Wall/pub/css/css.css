@@ -1,0 +1,449 @@
+@charset 'utf-8';
+/*reset*/
+
+html,
+body {
+    overflow: auto;
+}
+
+body,
+div,
+p,
+dl,
+th,
+dt,
+dd,
+ul,
+ol,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+pre,
+form,
+fieldset,
+input,
+textarea,
+blockquote {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: MicroSoft YaHei, simHei;
+    font-size: 36px;
+    text-align: center;
+    background-color: #c62408;
+}
+
+div {
+    text-align: left;
+}
+
+table,
+td,
+tr,
+th {
+    font-size: 12px;
+}
+
+li {
+    list-style-type: none;
+}
+
+table {
+    margin: 0 auto;
+}
+
+img {
+    vertical-align: top;
+    border: 0;
+}
+
+ol,
+ul {
+    list-style: none;
+}
+
+caption,
+th {
+    text-align: left;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-size: 12px;
+    font-weight: normal;
+}
+
+q:before,
+q:after {
+    content: '';
+}
+
+abbr,
+acronym {
+    border: 0;
+}
+
+address,
+caption,
+cite,
+code,
+dfn,
+em,
+th,
+var {
+    font-weight: normal;
+    font-style: normal;
+}
+
+a {
+    text-decoration: none;
+    color: #333;
+}
+
+a:visited {
+    text-decoration: none;
+    color: #333;
+}
+
+a:hover {
+    text-decoration: underline;
+    color: #2a66c1;
+}
+
+a:active {
+    color: #2a66c1;
+}
+
+.left {
+    float: left;
+}
+
+.right {
+    float: right;
+}
+
+.cl {
+    zoom: 1;
+}
+
+.cl:after {
+    display: block;
+    clear: both;
+    height: 0;
+    content: '';
+}
+
+.clear {
+    font-size: 0;
+    line-height: 0;
+    display: block;
+    clear: both;
+    height: 0;
+}
+
+.wrapperSize1024,
+.wrapperSize1280 {
+    width: 100%;
+    height: 768px;
+    margin: 0 auto;
+    background: url(../images/bg.jpg) no-repeat center top;
+}
+
+.microblog {
+    width: 920px;
+    margin: 0 auto;
+    overflow: hidden;
+    padding-top: 20px;
+}
+
+.topbox {
+    overflow: hidden;
+    height: 94px;
+}
+
+.vip img {
+    margin-top: -5px;
+    vertical-align: middle;
+}
+
+.phone img {
+    margin-top: -5px;
+    vertical-align: middle;
+}
+/*微博墙头部*/
+/*只有用户自定义和微博logo*/
+
+.custom p {
+    font-size: 52px;
+    font-weight: bold;
+    font-style: italic;
+    line-height: 84px;
+    height: 84px;
+    padding-left: 130px;
+    text-align: center;
+    text-align: center;
+    color: #fff;
+    background: url(../images/custom.png) no-repeat right center;
+}
+
+.custom p.customCon {
+    font-size: 30px;
+    line-height: 40px;
+}
+
+.topbox .custom {
+    width: 500px;
+}
+
+.tencentLogo {
+    width: 400px;
+    height: 84px;
+    margin-left: 10px;
+    background: url(../images/logo.png) no-repeat;
+}
+
+.partnerLogo {
+    float: right;
+    width: 540px;
+    height: 84px;
+    text-align: right;
+}
+/*微博墙内容列表*/
+
+.talkBg {
+    width: 920px;
+    padding-top: 20px;
+    height: 540px;
+    background: url(../images/listBG.png) no-repeat;
+}
+
+.DCont,
+.talkList {
+    overflow: hidden;
+    width: 884px;
+    height: 515px;
+    margin: 0 auto;
+}
+
+.LC li,
+.DCont li {
+	overflow: hidden;
+    margin-bottom: 20px;
+    padding: 20px 15px;
+    border: 1px solid #cc1004;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    background: #320100 url(../images/listS.png) no-repeat center top;
+}
+
+.LC li.limit {
+    overflow: hidden;
+    height: 125px;
+    padding: 24px 15px 30px;
+}
+
+.userPic {
+    float: left;
+    margin-top: 5px;
+    padding: 3px;
+    border: 1px solid #5d5f7d;
+    background: #fff;
+}
+
+.userPic img {
+    overflow: hidden;
+    width: 100px;
+    height: 100px;
+}
+
+.msgBox,
+.bigPicBox {
+	color: #fff;
+    margin: 0 0 0 120px;
+}
+
+.msgBox {
+    font-weight: bold;
+    line-height: 1.4em;
+}
+
+.userName,
+.userName a,
+.msgCnt,
+.msgCnt a {
+    display: inline;
+    color: #FFD523;
+}
+
+.userName a {
+    line-height: 1.5em;
+    color: #d0fc9b;
+}
+
+.picWrap {
+    clear: both;
+    margin: 10px 0;
+}
+
+.DCont .picBox {
+    float: left;
+    padding: 3px;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    background: #71cef0;
+}
+
+.msgCnt,
+.msgBox {
+    word-wrap: break-word;
+    word-break: break-all;
+}
+/*转播的情况*/
+
+.replyBox .msgBox {
+    margin: 10px 0;
+    padding: 8px 20px;
+    border: 1px solid #b6b7b7;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+/*固定高带图片的情况*/
+
+.LC li.limit .mbPic img {
+    width: 120px;
+    height: 120px;
+}
+
+.mbPic img {
+    float: right;
+    padding: 3px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+}
+
+.LC li .mbPic,
+.LC li.pic .mbPic,
+.LC li.zb .mbPic {
+    display: none;
+}
+
+.LC li.limit .mbPic {
+    display: block;
+    float: right;
+    width: 130px;
+    height: 130px;
+    margin: 5px 0 0 10px;
+}
+/* 单条弹出 */
+
+.D .bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.D .bg .bgCover {
+    width: 1280px;
+    height: 768px;
+    margin: 0 auto;
+    opacity: .6;
+    background: #000;
+    filter: alpha(opacity=60);
+}
+
+.D .CR {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 920px;
+    margin: 119px 0 0 -460px;
+}
+
+.D .DWrap {
+    width: 920px;
+    height: 593px;
+}
+
+.DWrap li {
+    font-size: 36px;
+    height: 482px;
+    *margin-left: -15px;
+}
+/* 单条弹出-图片 */
+
+.imgPopup {
+    position: absolute;
+    z-index: 10006;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.blockLayer {
+    position: absolute;
+    z-index: 10001;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: .7;
+    background: none repeat scroll 0 0 #000;
+    filter: alpha(opacity=70);
+}
+
+.imgPopup .bigPicBox {
+    height: 100%;
+    height: auto!important;
+    min-height: 125px;
+    margin: 0 auto;
+    padding-top: 139px;
+    text-align: center;
+    border-left: 1px solid #b6b7b7;
+    _height: 125px;
+}
+
+.bigPicBox img {
+    position: relative;
+    z-index: 10003;
+    max-width: 725px;
+    padding: 2px;
+    text-align: center;
+    border: 1px solid #b6b7b7;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+}
+
+.topbox .custom,
+.topbox .tencentLogo {
+    float: left;
+}
+
+.custom p {
+    font-size: 35px;
+    padding-left: 50px;
+}
+
+#con {
+	position: relative;
+}
+#con .LC {
+	left: 0;
+	position: absolute;
+	pointer-events: none;
+}
