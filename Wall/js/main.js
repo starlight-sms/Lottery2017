@@ -49,3 +49,5 @@ function stopSwapFrame() {
 }
 
 keepsSwapFrame();
+$('img').jqthumb();
+
